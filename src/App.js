@@ -123,12 +123,14 @@ function getRandomParagraph(difficulty) {
 
   // If it's already an object (UPDATED), return it
   if (typeof item === "object") return item;
-
+  
+  /* UNNECESSARY SECTION, ALL CONVERTED TO OBJECTS
   // If it's a string (NOT UPDATED), wrap it
   return {
     text: item,
     source: "Unknown Source",
   };
+  */
 }
 
 function getPerformanceLabel(wpm) {
