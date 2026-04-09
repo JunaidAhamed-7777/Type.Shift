@@ -6,6 +6,7 @@ import "./App.css";
 const PARAGRAPHS = {
   easy: [
 	//ADD ONE SPACE AT BEGINNING OF SOURCE
+
     {
       text: "Once there were four children named Peter, Susan, Edmund, and Lucy who were sent away from London to live in a large old house full of rooms and long quiet hallways.",
       source: " The Lion, the Witch and the Wardrobe · C.S. Lewis · Chapter 1",
@@ -88,10 +89,31 @@ const PARAGRAPHS = {
 
   ],
   code: [
-    "const fetchData = async (url) => { try { const res = await fetch(url); if (!res.ok) throw new Error('Network error'); const data = await res.json(); return data; } catch (err) { console.error('Failed:', err.message); return null; } };",
-    "function mergeSort(arr) { if (arr.length <= 1) return arr; const mid = Math.floor(arr.length / 2); const left = mergeSort(arr.slice(0, mid)); const right = mergeSort(arr.slice(mid)); return merge(left, right); }",
-    "class EventEmitter { constructor() { this.events = {}; } on(event, listener) { if (!this.events[event]) this.events[event] = []; this.events[event].push(listener); } emit(event, ...args) { (this.events[event] || []).forEach(fn => fn(...args)); } }",
-    "const debounce = (fn, delay) => { let timer; return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; }; window.addEventListener('resize', debounce(handleResize, 300));",
+    {
+      text: "int bs(int a[],int n,int x){int l=0,r=n-1;while(l<=r){int m=(l+r)/2;if(a[m]==x)return m;else if(a[m]<x)l=m+1;else r=m-1;}return -1;}",
+      source: " Binary Search",
+    },
+	
+	{
+      text: "void bubble(int a[],int n){for(int i=0;i<n;i++)for(int j=0;j<n-i-1;j++)if(a[j]>a[j+1]){int t=a[j];a[j]=a[j+1];a[j+1]=t;}}",
+      source: " Bubble Sort",
+    },
+	
+	{
+      text: "int fact(int n){if(n<=1)return 1;return n*fact(n-1);} int main(){int x=5;printf(\"%d\",fact(x));}",
+      source: " Factorial (Recursion)",
+    },
+	
+	{
+      text: "int fib(int n){if(n<=1)return n;int a=0,b=1,c;for(int i=2;i<=n;i++){c=a+b;a=b;b=c;}return b;}",
+      source: " Fibonacci (Iterative)",
+    },
+	
+	{
+      text: "int lin(int a[],int n,int x){for(int i=0;i<n;i++)if(a[i]==x)return i;return -1;}",
+      source: " Linear Search",
+    },
+	
   ],
 };
 
