@@ -499,7 +499,7 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        built with React · With Love · By Junaid
+        Open Source · With Love · By Junaid
       </footer>
     </div>
   );
