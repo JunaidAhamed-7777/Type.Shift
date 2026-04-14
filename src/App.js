@@ -331,7 +331,7 @@ function startMatrix(canvasId) {
     context.fillStyle = "rgba(0, 0, 0, 0.05)";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    context.fillStyle = "#0F0";
+    context.fillStyle = "rgb(49, 105, 24)";
     context.font = fontSize + "px monospace";
 
     for (let i = 0; i < rainDrops.length; i++) {
@@ -488,7 +488,10 @@ export default function App() {
     <div className="app">
 
       {isFinished && (
-        <canvas id="matrix-bg" className="matrix-bg"></canvas>
+        <>
+          <canvas id="matrix-bg" className="matrix-bg"></canvas>
+          <div className="matrix-overlay"></div>
+        </>
       )}
 
       <div className="scanlines" aria-hidden="true" />
