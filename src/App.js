@@ -303,7 +303,56 @@ function Result({ wpm, accuracy, timeTaken, source,image, onRestart }) {
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
+
+function startMatrix(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  const context = canvas.getContext("2d");
+
+  canvas.width = canvas.offsetWidth;
+  canvas.height = window.innerHeight;
+
+  const katakana =
+    "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
+  const latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const nums = "0123456789";
+  const alphabet = katakana + latin + nums;
+
+  const fontSize = 16;
+  const columns = canvas.width / fontSize;
+  const rainDrops = Array(Math.floor(columns)).fill(1);
+
+  const draw = () => {
+    context.fillStyle = "rgba(0, 0, 0, 0.05)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "#0F0";
+    context.font = fontSize + "px monospace";
+
+    for (let i = 0; i < rainDrops.length; i++) {
+      const text = alphabet.charAt(
+        Math.floor(Math.random() * alphabet.length)
+      );
+      context.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+      if (
+        rainDrops[i] * fontSize > canvas.height &&
+        Math.random() > 0.975
+      ) {
+        rainDrops[i] = 0;
+      }
+      rainDrops[i]++;
+    }
+  };
+
+  return setInterval(draw, 30);
+}
+
 export default function App() {
+
+  
+
   const TOTAL_TIME = 60;
 
   const [difficulty, setDifficulty] = useState("medium");
@@ -315,6 +364,20 @@ export default function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [startTime, setStartTime] = useState(null);
+
+  useEffect(() => {
+    let leftRain, rightRain;
+
+    if (isFinished) {
+      leftRain = startMatrix("matrix-left");
+      rightRain = startMatrix("matrix-right");
+    }
+
+    return () => {
+      clearInterval(leftRain);
+      clearInterval(rightRain);
+    };
+  }, [isFinished]);
 
   const inputRef = useRef(null);
   const timerRef = useRef(null);
@@ -419,6 +482,14 @@ export default function App() {
 
   return (
     <div className="app">
+
+      {isFinished && (
+        <>
+          <canvas id="matrix-left" className="matrix-canvas"></canvas>
+          <canvas id="matrix-right" className="matrix-canvas"></canvas>
+        </>
+      )}
+
       <div className="scanlines" aria-hidden="true" />
 
       <header className="app-header">
@@ -503,4 +574,7 @@ export default function App() {
       </footer>
     </div>
   );
+
+  
+
 }
