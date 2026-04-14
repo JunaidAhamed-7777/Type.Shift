@@ -304,6 +304,10 @@ function Result({ wpm, accuracy, timeTaken, source,image, onRestart }) {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
+/*
+MATRIX RAIN EFFECT
+CREDITS ALL BELONG TO https://github.com/javascriptacademy-stash/digital-rain
+*/
 function startMatrix(canvasId) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
@@ -363,7 +367,9 @@ export default function App() {
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [startTime, setStartTime] = useState(null);
+  //const [startTime, setStartTime] = useState(null);
+
+  
 
   useEffect(() => {
     let leftRain, rightRain;
@@ -426,7 +432,7 @@ export default function App() {
       // Start timer on first keystroke
       if (!isRunning && val.length > 0) {
         setIsRunning(true);
-        setStartTime(Date.now());
+        //setStartTime(Date.now());
       }
 
       setUserInput(val);
@@ -450,7 +456,7 @@ export default function App() {
     setTimeLeft(TOTAL_TIME);
     setIsRunning(false);
     setIsFinished(false);
-    setStartTime(null);
+    //setStartTime(null);
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [difficulty]);
 
@@ -464,7 +470,7 @@ export default function App() {
     setTimeLeft(TOTAL_TIME);
     setIsRunning(false);
     setIsFinished(false);
-    setStartTime(null);
+    //etStartTime(null);
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
