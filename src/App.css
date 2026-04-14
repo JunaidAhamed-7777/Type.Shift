@@ -294,7 +294,7 @@ body {
 
 .shortcut-hint {
   font-size: 0.65rem;
-  color: var(--text-dim);
+  color: #ffffff;
   text-align: center;
   opacity: 0.5;
   letter-spacing: 0.5px;

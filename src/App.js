@@ -465,7 +465,7 @@ export default function App() {
               isFinished={isFinished}
               inputRef={inputRef}
             />
-            <p className="shortcut-hint">tab → restart</p>
+            <p className="shortcut-hint">TAB → Restart</p>
             <div className="social-links">
               <a
                 href="https://github.com/JunaidAhamed-7777/Type.Shift"
