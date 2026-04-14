@@ -372,16 +372,14 @@ export default function App() {
   
 
   useEffect(() => {
-    let leftRain, rightRain;
-
+    //let leftRain, rightRain;
+    let rain;
     if (isFinished) {
-      leftRain = startMatrix("matrix-left");
-      rightRain = startMatrix("matrix-right");
+      rain = startMatrix("matrix-bg");
     }
 
     return () => {
-      clearInterval(leftRain);
-      clearInterval(rightRain);
+      clearInterval(rain);
     };
   }, [isFinished]);
 
@@ -490,10 +488,7 @@ export default function App() {
     <div className="app">
 
       {isFinished && (
-        <>
-          <canvas id="matrix-left" className="matrix-canvas"></canvas>
-          <canvas id="matrix-right" className="matrix-canvas"></canvas>
-        </>
+        <canvas id="matrix-bg" className="matrix-bg"></canvas>
       )}
 
       <div className="scanlines" aria-hidden="true" />
