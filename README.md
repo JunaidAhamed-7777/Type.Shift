@@ -1,3 +1,5 @@
+# Typing Speed Test
+
 								With Love  ⣠⣶⣶⣶⣦⠀⠀
 								⠀⠀⣠⣤⣤⣄⣀⣾⣿⠟⠛⠻⢿⣷⠀
 								⢰⣿⡿⠛⠙⠻⣿⣿⠁⠀⠀⠀⣶⢿⡇
@@ -5,39 +7,57 @@
 								⠀⠻⣿⣷⣦⣤⣀⠀⠀⠀⠀⣾⡿⠃⠀
 								⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀
 								⠀⠀⠀⠀⠀⠀⠀⣿⡿⠟⠁⠀⠀⠀⠀
------------------------------
-Always in need of more (sourced) paragraphs for different difficulty levels.
 
-Format used will be:
+---
 
-		Easy: Children's Books, 150 to 200 characters 
-		Medium: Novels, 200 to 250 characters
-		Hard: Scientific research articles, 250-300 characters 
-		Code: Any well known code of a famous algorithm, upto 100 characters.
+## About
 
-Source provision and cover image is also necessary as without those two, the code will break.
+A React-based typing speed test application featuring multiple difficulty levels using passages from books, scientific texts, and famous algorithms.
 
-----------------------------
+---
 
-Code built by Junaid
-Built using REACT.js
+## Difficulty Formats
 
+- Easy → Children's books (150–200 characters)
+- Medium → Novels (200–250 characters)
+- Hard → Scientific articles (250–300 characters)
+- Code → Famous algorithms (up to 100 characters)
 
-	Currently no backend in use
-	if future backend{
-	    Login system,
-	    Personal wpm tracker{
-	        graph that shows diff. wpm count,
-	        diff. difficulties, diff colours
-	    },
-	    set wpm goals,
-	    show personal best leaderboard
-	}
+Source attribution and cover images are required for all passages.
 
-DO NOT REMOVE COMMENTS INSIDE CODE,
-COMMENTED CODE SECTIONS MUST BE RETAINED 
+---
 
-##Project Structure
+## Tech Stack
+
+- React.js
+- CSS
+
+Currently no backend is in use.
+
+---
+
+## Planned Features
+
+- Login system
+- Personal WPM tracker
+- WPM progress graphs
+- Difficulty-based statistics
+- Custom WPM goals
+- Personal best leaderboard
+
+---
+
+## Developer Notes
+
+```text
+DO NOT REMOVE COMMENTS INSIDE CODE
+COMMENTED CODE SECTIONS MUST BE RETAINED
+```
+
+---
+
+## Project Structure
+
 ```text
 src
 ├── App.css
@@ -53,5 +73,11 @@ public
 ├── manifest.json
 ├── robots.txt
 └── assets
-	└──Relevant images for typing passages
+    └── Relevant images for typing passages
 ```
+
+---
+
+## Author
+
+Built by Junaid
