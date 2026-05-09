@@ -37,7 +37,8 @@ Built using REACT.js
 DO NOT REMOVE COMMENTS INSIDE CODE,
 COMMENTED CODE SECTIONS MUST BE RETAINED 
 
-#Project Structure
+##Project Structure
+```text
 src
 ├── App.css
 ├── App.js
@@ -52,4 +53,5 @@ public
 ├── manifest.json
 ├── robots.txt
 └── assets
-	└──Relevant images for typing passages 
+	└──Relevant images for typing passages
+```
