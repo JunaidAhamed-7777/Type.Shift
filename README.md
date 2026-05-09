@@ -36,3 +36,20 @@ Built using REACT.js
 
 DO NOT REMOVE COMMENTS INSIDE CODE,
 COMMENTED CODE SECTIONS MUST BE RETAINED 
+
+#Project Structure
+src
+├── App.css
+├── App.js
+└── index.js
+
+public
+├── favicon.ico
+├── index.html
+├── logo.png
+├── logo192.png
+├── logo512.png
+├── manifest.json
+├── robots.txt
+└── assets
+	└──Relevant images for typing passages 
