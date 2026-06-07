@@ -12,7 +12,11 @@
 
 ## About
 
-A React-based typing speed test application featuring multiple difficulty levels using passages from books, scientific texts, and famous algorithms.
+- A React-based typing speed test application featuring multiple difficulty levels using passages from books, scientific texts, and famous algorithms.
+- Hosted on https://typeshift-alpha2.vercel.app
+- Preview:
+<img width="1866" height="873" alt="Screenshot 2026-06-08 003437" src="https://github.com/user-attachments/assets/e1dc5962-8a44-4db7-84bb-26f348ff9e71" />
+<img width="1848" height="875" alt="Screenshot 2026-06-08 003514" src="https://github.com/user-attachments/assets/cc0fb987-53a6-43fb-a68d-cde16e68c994" />
 
 ---
 
