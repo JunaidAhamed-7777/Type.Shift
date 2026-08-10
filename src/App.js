@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Analytics } from '@vercel/analytics/react';
 
 // ─── Paragraphs ───────────────────────────────────────────────────────────
 
@@ -576,6 +577,7 @@ export default function App() {
       <footer className="app-footer">
         Open Source · With Love · By Junaid
       </footer>
+      <Analytics />
     </div>
   );
 
