@@ -575,7 +575,7 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        Open Source · With Love · By Junaid
+        With Love · For You · By Junaid
       </footer>
       <Analytics />
     </div>
