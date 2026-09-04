@@ -208,6 +208,60 @@ function LiveStats({ wpm, accuracy, correctChars, totalTyped, onRestart }) {
   );
 }
 
+// ─── Welcome Lightbox ─────────────────────────────────────────────────
+function WelcomeLightbox({ onClose }) {
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className="lightbox-backdrop"
+      onMouseDown={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lightbox-title"
+    >
+      <div className="lightbox">
+        <button
+          className="lightbox-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div className="lightbox-content">
+          <h2 id="lightbox-title">
+            Test your typing speed and accuracy with Type.Shift
+          </h2>
+
+          <p>
+            The <span className="lightbox-green">free</span> online typing
+            speed tester.
+          </p>
+
+          <p>
+            Choose from different difficulty levels and measure your words
+            per minute (WPM), accuracy, and typing performance.
+          </p>
+
+          <p>
+            Practice with passages from books, scientific texts, and
+            programming algorithms.
+          </p>
+
+          <p className="lightbox-red">
+            No account is required to start a typing test.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Typing Box ───────────────────────────────────────────────────────
 function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
   const boxRef = useRef(null);
@@ -360,6 +414,8 @@ export default function App() {
 
   const TOTAL_TIME = 60;
 
+  const [showLightbox, setShowLightbox] = useState(true);
+
   const [difficulty, setDifficulty] = useState("medium");
   const [paragraphData, setParagraphData] = useState(() =>
     getRandomParagraph("medium")
@@ -486,7 +542,12 @@ export default function App() {
   }, [handleRestart]);
 
   return (
+
     <div className="app">
+
+    {showLightbox && (
+      <WelcomeLightbox onClose={() => setShowLightbox(false)} />
+    )}
 
       {isFinished && (
         <>
