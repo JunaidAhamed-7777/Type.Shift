@@ -1,0 +1,43 @@
+PRIVACY POLICY
+
+Last updated: 2025-09-07
+
+1. Introduction
+Type.Shift ("we", "our", "us") respects your privacy. This policy explains what information we collect, why we collect it, and how we handle it when you use our typing speed test website ("the Service").
+
+2. What information we collect
+We do not require you to create an account or provide any personal data (such as your name, email address, or location) to use the Service.
+
+The only data we may collect is:
+- Anonymous usage statistics (e.g., which difficulty levels you choose, your typing speed, accuracy, and time taken) via Vercel Analytics.
+- Technical information automatically sent by your browser (e.g., browser type, device type, IP address, and referring URL) – these are anonymised and used in aggregate for performance and improvement.
+
+We do not:
+- Store any personal information on our servers.
+- Use cookies for tracking or advertising purposes.
+- Share, sell, or rent your data with third parties (except as noted below).
+
+3. Third-party services
+We use Vercel Analytics (provided by Vercel Inc.) to understand general usage patterns. Vercel collects anonymised data and does not identify individual users. Their privacy policy is available at https://vercel.com/privacy.
+We use Google AdSense to display SAFE advertisements verified by Google. (All complaints regarding this are to be taken up with Google)
+No other third‑party analytics, advertising, or tracking tools are used.
+
+4. Data retention
+Because we do not store any personal data, there is nothing to retain, delete, or export. All statistics are aggregated and not tied to any individual.
+
+5. Your rights
+Under data protection laws (e.g., GDPR, CCPA), you have the right to:
+- Access, correct, or delete any personal data we hold (we hold none).
+- Withdraw consent at any time (by simply not using the Service).
+
+If you have any questions, you can contact us via the GitHub repository linked on the site, or mail the owner and current developer of the website at junuhammad2@gmail.com.
+
+6. Changes to this policy
+We may update this policy occasionally. The latest version will always be available at this URL.
+
+7. Contact
+If you have concerns about this privacy policy or our data practices, please:
+- Open an issue at https://github.com/JunaidAhamed-7777/Type.Shift (or use the GitHub link on the website).
+- Mail to junuhammad2@gmail.com with all necessary contexts
+
+---
