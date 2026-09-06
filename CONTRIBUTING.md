@@ -409,21 +409,3 @@ npm run build
 ```
 
 The goal is to keep the dataset complete, the image metadata accurate, and placeholder usage limited to cases where a real cover cannot reasonably be added.
-
-````
-
-### Add this to the README
-
-I would add a section between `Developer Notes` and `Project Structure`:
-
-```markdown
----
-
-## Contributing
-
-Contributions are welcome, especially new typing passages, book covers, code snippets, bug fixes, and improvements.
-
-For instructions on adding passages, fetching book covers, handling failed cover lookups, and using placeholders, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-````
