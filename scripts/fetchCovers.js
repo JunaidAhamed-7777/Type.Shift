@@ -2,14 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Path to your paragraphs.js
 const PARAGRAPHS_PATH = path.join(__dirname, '../src/data/paragraphs.js');
-// Where images are stored – now pointing to the 'public' folder
+// Where images are stored – pointing to the 'public' folder
 const ASSETS_ROOT = path.join(__dirname, '../public');
+
+// Google Books API key from .env
+const GOOGLE_BOOKS_API_KEY = process.env.GOOGLE_BOOKS_API_KEY || '';
 
 // Read paragraphs.js as string
 const fileContent = fs.readFileSync(PARAGRAPHS_PATH, 'utf8');
@@ -33,8 +37,8 @@ function parseSource(source) {
   return { title, author };
 }
 
-// Search OpenLibrary for the book and return cover_id (if found)
-async function findCoverId(title, author) {
+// --- OpenLibrary search ---
+async function findOpenLibraryCoverId(title, author) {
   try {
     const searchUrl = 'https://openlibrary.org/search.json';
     const params = new URLSearchParams({
@@ -52,7 +56,58 @@ async function findCoverId(title, author) {
     }
     return null;
   } catch (err) {
-    console.warn(`Search failed for "${title}": ${err.message}`);
+    console.warn(`OpenLibrary search failed for "${title}": ${err.message}`);
+    return null;
+  }
+}
+
+// --- Google Books search (fallback) ---
+async function findGoogleBooksCoverUrl(title, author) {
+  try {
+    // Build search query: title + author
+    let query = `intitle:${encodeURIComponent(title)}`;
+    if (author) {
+      query += `+inauthor:${encodeURIComponent(author)}`;
+    }
+
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=1`;
+
+    // Add API key if available
+    const finalUrl = GOOGLE_BOOKS_API_KEY
+      ? `${url}&key=${GOOGLE_BOOKS_API_KEY}`
+      : url;
+
+    const response = await axios.get(finalUrl);
+    const data = response.data;
+
+    if (data.items && data.items.length > 0) {
+      const volumeInfo = data.items[0].volumeInfo;
+      // Try to get larger image (extraLarge, large, medium, small, thumbnail)
+      const imageLinks = volumeInfo.imageLinks;
+      if (imageLinks) {
+        // Prefer larger images
+        const sizes = ['extraLarge', 'large', 'medium', 'small', 'thumbnail'];
+        for (const size of sizes) {
+          if (imageLinks[size]) {
+            // Google serves HTTP images; upgrade to HTTPS
+            let imgUrl = imageLinks[size];
+            if (imgUrl.startsWith('http://')) {
+              imgUrl = imgUrl.replace('http://', 'https://');
+            }
+            // Remove zoom parameter for cleaner URL
+            imgUrl = imgUrl.replace('&zoom=1', '');
+            return imgUrl;
+          }
+        }
+      }
+    }
+    return null;
+  } catch (err) {
+    if (err.response && err.response.status === 403) {
+      console.warn(`Google Books API key may be invalid or quota exceeded.`);
+    } else {
+      console.warn(`Google Books search failed for "${title}": ${err.message}`);
+    }
     return null;
   }
 }
@@ -78,13 +133,15 @@ async function fetchAllCovers() {
         allEntries.push({
           ...entry,
           category,
-          // Keep the original image path for display, but we'll build file path differently
         });
       }
     });
   }
 
   console.log(`Found ${allEntries.length} entries with image paths.`);
+  if (!GOOGLE_BOOKS_API_KEY) {
+    console.warn('⚠️  No Google Books API key found. Set GOOGLE_BOOKS_API_KEY in .env for better coverage.');
+  }
 
   let success = 0, skipped = 0, failed = 0;
 
@@ -96,9 +153,7 @@ async function fetchAllCovers() {
       continue;
     }
 
-    // Build correct file path: public/ + (image path without leading slash)
-    // e.g. entry.image = "/assets/easy/littleredridinghood.png"
-    //      -> removes leading "/" -> "assets/easy/littleredridinghood.png"
+    // Build correct file path
     const relativePath = entry.image.slice(1); // remove leading "/"
     const filePath = path.join(ASSETS_ROOT, relativePath);
     const dir = path.dirname(filePath);
@@ -115,26 +170,40 @@ async function fetchAllCovers() {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    // Try to get cover_id via search
-    let coverId = await findCoverId(title, author);
     let url = null;
+    let source = '';
 
+    // Try 1: OpenLibrary
+    let coverId = await findOpenLibraryCoverId(title, author);
     if (coverId) {
       url = `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
-    } else {
-      // Fallback to old title-based endpoint (works sometimes)
+      source = 'OpenLibrary';
+    }
+
+    // Try 2: Google Books (fallback)
+    if (!url) {
+      const googleUrl = await findGoogleBooksCoverUrl(title, author);
+      if (googleUrl) {
+        url = googleUrl;
+        source = 'Google Books';
+      }
+    }
+
+    // Try 3: OpenLibrary title-based (last resort)
+    if (!url) {
       const base = 'https://covers.openlibrary.org/b/title/';
       const query = new URLSearchParams({ default: 'false', size: 'M' });
       if (author) query.set('author', author);
       url = `${base}${encodeURIComponent(title)}?${query.toString()}`;
+      source = 'OpenLibrary (title fallback)';
     }
 
     try {
       await downloadImage(url, filePath);
-      console.log(`Downloaded: ${relativePath} (${title})`);
+      console.log(`✅ Downloaded: ${relativePath} (${title}) [${source}]`);
       success++;
     } catch (err) {
-      console.error(`Failed to download for ${relativePath}: ${err.message}`);
+      console.error(`❌ Failed to download for ${relativePath}: ${err.message}`);
       failed++;
       // Optionally create a placeholder image here
     }
@@ -143,7 +212,7 @@ async function fetchAllCovers() {
     await new Promise(resolve => setTimeout(resolve, 300));
   }
 
-  console.log(`Done. Success: ${success}, Skipped (already exist): ${skipped}, Failed: ${failed}`);
+  console.log(`\n📊 Done. Success: ${success}, Skipped (already exist): ${skipped}, Failed: ${failed}`);
 }
 
 fetchAllCovers().catch(console.error);
