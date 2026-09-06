@@ -25,9 +25,8 @@ The application provides multiple difficulty levels with typing passages drawn f
 
 ### Preview
 
-<img width="1863" height="868" alt="image" src="[https://github.com/user-attachments/assets/72e10324-af71-4bf3-8b7d-ddf5278b8f53](https://github.com/user-attachments/assets/72e10324-af71-4bf3-8b7d-ddf5278b8f53)" />
-
-<img width="1848" height="875" alt="Screenshot 2026-06-08 003514" src="[https://github.com/user-attachments/assets/cc0fb987-53a6-43fb-a68d-cde16e68c994](https://github.com/user-attachments/assets/cc0fb987-53a6-43fb-a68d-cde16e68c994)" />
+<img width="1863" height="876" alt="image" src="https://github.com/user-attachments/assets/6fcb2bec-f210-49bf-901a-06a984b99286" />
+<img width="1866" height="862" alt="image" src="https://github.com/user-attachments/assets/5abf4b03-a874-4da0-822f-6478e1aa1e81" />
 
 ---
 
