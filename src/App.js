@@ -160,6 +160,101 @@ function WelcomeLightbox({ onClose }) {
   );
 }
 
+// ─── Legal Lightbox ─────────────────────────────────────────────────
+
+function LegalLightbox({ type, onClose }) {
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const title = type === "privacy" ? "Privacy Policy" : "Terms of Use";
+  const filePath =
+    type === "privacy"
+      ? "/legal/privacy.txt"
+      : "/legal/usage.txt";
+
+  useEffect(() => {
+    let cancelled = false;
+
+    setIsLoading(true);
+    setError(false);
+    setContent("");
+
+    fetch(filePath)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load ${filePath}`);
+        }
+
+        return response.text();
+      })
+      .then((text) => {
+        if (!cancelled) {
+          setContent(text);
+          setIsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError(true);
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filePath]);
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className="lightbox-backdrop"
+      onMouseDown={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="legal-lightbox-title"
+    >
+      <div className="lightbox legal-lightbox">
+        <button
+          className="lightbox-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div className="lightbox-content">
+          <h2 id="legal-lightbox-title">{title}</h2>
+
+          {isLoading && (
+            <p className="legal-loading">
+              Loading...
+            </p>
+          )}
+
+          {error && (
+            <p className="legal-error">
+              Unable to load this document.
+            </p>
+          )}
+
+          {!isLoading && !error && (
+            <div className="legal-text">
+              {content}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Typing Box ───────────────────────────────────────────────────────
 function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
   const boxRef = useRef(null);
@@ -310,6 +405,7 @@ export default function App() {
   const TOTAL_TIME = 60;
 
   const [showLightbox, setShowLightbox] = useState(true);
+  const [legalType, setLegalType] = useState(null);
 
   const [difficulty, setDifficulty] = useState("medium");
   const [paragraphData, setParagraphData] = useState(() =>
@@ -454,6 +550,13 @@ export default function App() {
       <WelcomeLightbox onClose={() => setShowLightbox(false)} />
     )}
 
+    {legalType && (
+      <LegalLightbox
+        type={legalType}
+        onClose={() => setLegalType(null)}
+      />
+    )}
+
       {isFinished && (
         <>
           <canvas id="matrix-bg" className="matrix-bg"></canvas>
@@ -534,7 +637,19 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        With Love · For You · By Junaid
+        <div>With Love · For You · By Junaid</div>
+
+        <div className="legal-links">
+          <button onClick={() => setLegalType("privacy")}>
+            Privacy Policy
+          </button>
+
+          <span>·</span>
+
+          <button onClick={() => setLegalType("terms")}>
+            Terms of Use
+          </button>
+        </div>
       </footer>
       <Analytics />
     </div>

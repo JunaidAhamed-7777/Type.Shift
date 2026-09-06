@@ -779,6 +779,16 @@ html {
 
     font-size: 1.25rem;
   }
+
+  .legal-lightbox {
+    width: 100%;
+  }
+
+  .legal-text {
+    max-height: 60vh;
+    font-size: 0.7rem;
+    line-height: 1.75;
+  }
 }
 
 /* DarkVeil Background */
@@ -796,4 +806,66 @@ html {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* ─── Legal Links ─────────────────────────────────────────────────── */
+
+.legal-links {
+  margin-top: 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.legal-links button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: #aaaaaa;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.legal-links button:hover {
+  color: var(--green);
+}
+
+.legal-links span {
+  color: #aaaaaa;
+  font-size: 0.65rem;
+}
+
+/* ─── Legal Lightbox Content ─────────────────────────────────────── */
+
+.legal-lightbox {
+  width: min(700px, 100%);
+}
+
+.legal-text {
+  max-height: 55vh;
+  overflow-y: auto;
+
+  color: var(--text);
+  font-size: 0.78rem;
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+
+  padding-right: 0.5rem;
+}
+
+.legal-loading,
+.legal-error {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  line-height: 1.8;
+}
+
+.legal-error {
+  color: var(--red);
 }
