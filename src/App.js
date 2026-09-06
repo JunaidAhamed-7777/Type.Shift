@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import { Analytics } from '@vercel/analytics/react';
 import PARAGRAPHS from "./data/paragraphs";
 import DarkVeil from "./components/DarkVeil";
@@ -494,14 +494,7 @@ export default function App() {
                 <FaGithub />
               </a>
 
-              <a
-                href="https://www.linkedin.com/in/junaid-ahamed-77920a346/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-              >
-                <FaLinkedin />
-              </a>
+              
             </div>
           </>
         ) : (
