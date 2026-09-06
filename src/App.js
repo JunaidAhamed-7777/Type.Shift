@@ -637,7 +637,7 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        <div>With Love · For You · By Junaid</div>
+        <div>With Love · For My Avanthika · By Junaid</div>
 
         <div className="legal-links">
           <button onClick={() => setLegalType("privacy")}>
