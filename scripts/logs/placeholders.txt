@@ -1,3 +1,10 @@
+=======================================================
+IMPORTANT INFORMATION
+=======================================================
+1. do NOT run addPlaceholder.js without running fetchCovers.js because if a route exists in paragraphs.js and the image does not exist in assets/, it WILL add the placeholder image as the actual image.
+2. Run addPlaceholder.js IF AND ONLY IF you are unable to add the book cover image to assets/ for some reason.
+3. READ THIS LOG FILE to understand which images are placeholders.
+4. If you replaced a placeholder image with the actual book cover, then DO NOT DELETE THE LOG, simply append "ACTUAL IMAGE ADDED" to the right side of a particular log
 
 PLACEHOLDER IMAGES AS OF 2026-09-06T18:59:22.327Z
 assets/easy/baba-yaga.png
