@@ -47,19 +47,34 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-   min-height: 100dvh;   /* dynamic height for mobile */
+  min-height: 100dvh;
   overflow-x: hidden;
-  overflow-y: auto;
   padding: 2rem 1rem 1.5rem;
   position: relative;
 
-  /* radial glow */
   background:
     radial-gradient(ellipse 60% 40% at 50% 0%, rgba(57, 255, 20, 0.04) 0%, transparent 70%),
     var(--bg);
-  
-    position: relative;
-    z-index: 10;
+
+  z-index: 10;
+}
+
+.app.game-active {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.app.game-active .test-area {
+  flex: 1;
+  min-height: 0;
+}
+
+.app.results-active {
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .app-header {
@@ -399,12 +414,13 @@ body {
 
 .app-footer {
   margin-top: auto;
-  padding-top: 2rem;
+  padding-top: 1rem;
   font-size: 0.65rem;
   color: #aaaaaa;
   letter-spacing: 0.5px;
   opacity: 0.5;
   text-align: center;
+  flex-shrink: 0;
 }
 
 @keyframes fadeDown {
@@ -868,4 +884,27 @@ html {
 
 .legal-error {
   color: var(--red);
+}
+
+@media (min-width: 601px) {
+  .app.game-active {
+    padding-top: 1.25rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .app.game-active .app-header {
+    margin-bottom: 1rem;
+  }
+
+  .app.game-active .controls {
+    margin-bottom: 1rem;
+  }
+
+  .app.game-active .test-area {
+    gap: 0.85rem;
+  }
+
+  .app.game-active .app-footer {
+    padding-top: 0.6rem;
+  }
 }

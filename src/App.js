@@ -532,7 +532,7 @@ export default function App() {
 
   return (
 
-    <div className="app">
+    <div className={`app ${isFinished ? "results-active" : "game-active"}`}>
       <div className="darkveil-background">
         <DarkVeil
           hueShift={253}
