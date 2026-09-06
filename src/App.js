@@ -39,11 +39,23 @@ function getRandomParagraph(difficulty) {
   return list[randIdx];
 }
 
-function getPerformanceLabel(wpm) {
-  if (wpm >= 80) return { label: "Expert", color: "#ff6b35" };
-  if (wpm >= 60) return { label: "Advanced", color: "#39ff14" };
-  if (wpm >= 40) return { label: "Intermediate", color: "#00d4ff" };
-  if (wpm >= 20) return { label: "Beginner", color: "#ffd700" };
+// ─── Updated performance rating ──────────────────────────────────────
+function getPerformanceLabel(wpm, accuracy, timeTaken) {
+  const MAX_WPM = 80;
+  const TOTAL_TIME = 60; // seconds
+
+  // Normalise each metric to a 0–100 scale
+  const wpmScore = Math.min(wpm, MAX_WPM) / MAX_WPM * 100;
+  const accScore = accuracy; // accuracy is already 0–100
+  const timeScore = Math.max(0, 100 - (timeTaken / TOTAL_TIME) * 100);
+
+  // Composite score (simple average)
+  const composite = (wpmScore + accScore + timeScore) / 3;
+
+  if (composite >= 80) return { label: "Expert", color: "#ff6b35" };
+  if (composite >= 60) return { label: "Advanced", color: "#39ff14" };
+  if (composite >= 40) return { label: "Intermediate", color: "#00d4ff" };
+  if (composite >= 20) return { label: "Beginner", color: "#ffd700" };
   return { label: "Keep Practicing", color: "#a0a0a0" };
 }
 
@@ -202,8 +214,8 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
 }
 
 // ─── Result Screen ────────────────────────────────────────────────────
-function Result({ wpm, accuracy, timeTaken, source,image, onRestart }) {
-  const { label, color } = getPerformanceLabel(wpm);
+function Result({ wpm, accuracy, timeTaken, source, image, onRestart }) {
+  const { label, color } = getPerformanceLabel(wpm, accuracy, timeTaken);
   return (
     <div className="result-screen">
       <div className="result-badge" style={{ borderColor: color, color }}>
@@ -234,7 +246,6 @@ function Result({ wpm, accuracy, timeTaken, source,image, onRestart }) {
         <img src={image} alt="Book cover" />
       </div>
     )}
-
 
       <button className="restart-btn" onClick={onRestart}>
         ↺ Try Again
@@ -296,8 +307,6 @@ function startMatrix(canvasId) {
 
 export default function App() {
 
-  
-
   const TOTAL_TIME = 60;
 
   const [showLightbox, setShowLightbox] = useState(true);
@@ -311,8 +320,6 @@ export default function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   //const [startTime, setStartTime] = useState(null);
-
-  
 
   useEffect(() => {
     //let leftRain, rightRain;
