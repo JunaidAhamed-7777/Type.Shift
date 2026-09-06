@@ -4,6 +4,7 @@ import "./App.css";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { Analytics } from '@vercel/analytics/react';
 import PARAGRAPHS from "./data/paragraphs";
+import DarkVeil from "./components/DarkVeil";
 
 function getRandomParagraph(difficulty) {
   const list = PARAGRAPHS[difficulty];
@@ -412,6 +413,18 @@ export default function App() {
   return (
 
     <div className="app">
+      <div className="darkveil-background">
+        <DarkVeil
+          hueShift={253}
+          noiseIntensity={0}
+          scanlineIntensity={0}
+          speed={3}
+          scanlineFrequency={0.5}
+          warpAmount={1.3}
+          resolutionScale={1}
+          lightMode={false}
+        />
+      </div>
 
     {showLightbox && (
       <WelcomeLightbox onClose={() => setShowLightbox(false)} />

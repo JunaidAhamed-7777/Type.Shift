@@ -780,3 +780,20 @@ html {
     font-size: 1.25rem;
   }
 }
+
+/* DarkVeil Background */
+
+.darkveil-background {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.darkveil-background .darkveil-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
