@@ -6,20 +6,37 @@ import { Analytics } from '@vercel/analytics/react';
 import PARAGRAPHS from "./data/paragraphs";
 import DarkVeil from "./components/DarkVeil";
 
+// ─── Session‑based "no repeat" tracker ─────────────────────────────
+const usedIndices = {
+  easy: new Set(),
+  medium: new Set(),
+  hard: new Set(),
+  code: new Set(),
+};
+
 function getRandomParagraph(difficulty) {
   const list = PARAGRAPHS[difficulty];
-  const item = list[Math.floor(Math.random() * list.length)];
+  if (!list || list.length === 0) return null;
 
-  // If it's already an object (UPDATED), return it
-  if (typeof item === "object") return item;
-  
-  /* UNNECESSARY SECTION, ALL CONVERTED TO OBJECTS
-  // If it's a string (NOT UPDATED), wrap it
-  return {
-    text: item,
-    source: "Unknown Source",
-  };
-  */
+  const used = usedIndices[difficulty];
+  // Build list of available indices (not used yet)
+  const available = [];
+  for (let i = 0; i < list.length; i++) {
+    if (!used.has(i)) available.push(i);
+  }
+
+  // If all have been used, reset and start fresh
+  if (available.length === 0) {
+    used.clear();
+    // Now all indices are available
+    for (let i = 0; i < list.length; i++) available.push(i);
+  }
+
+  // Pick a random available index
+  const randIdx = available[Math.floor(Math.random() * available.length)];
+  used.add(randIdx);   // remember it for this session
+
+  return list[randIdx];
 }
 
 function getPerformanceLabel(wpm) {
