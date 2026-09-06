@@ -91,12 +91,12 @@ const PARAGRAPHS = {
     {
       text: "Baba Yaga lived in a hut that stood on chicken legs, and she flew around in a mortar, kidnapping children who strayed too deep into the forest.",
       source: " Baba Yaga · Russian Folktale · Introduction",
-      image: "/assets/easy/babayaga.png",
+      image: "/assets/easy/baba-yaga.png",
     },
     {
       text: "The gingerbread man ran away from the old woman and the cow, shouting as fast as he could, but the clever fox finally outran him and ate him up.",
       source: " The Gingerbread Man · Traditional · Chase Scene",
-      image: "/assets/easy/gingerbreadman.png",
+      image: "/assets/easy/the-gingerbread-man.png",
     },
     {
       text: "Snow White fled into the forest to escape the wicked queen, and she found a cottage where seven dwarfs welcomed her with kindness and a warm bed.",
@@ -106,12 +106,12 @@ const PARAGRAPHS = {
     {
       text: "The boy who cried wolf learned a hard lesson when the villagers stopped believing him; after the real wolf came, nobody came to help him at all.",
       source: " The Boy Who Cried Wolf · Aesop's Fables · Moral",
-      image: "/assets/easy/boycriedwolf.png",
+      image: "/assets/easy/the-boy-who-cried-wolf.png",
     },
     {
       text: "A young girl named Goldilocks entered the house of three bears and tasted their porridge, finding one bowl too hot, one too cold, and one just right.",
       source: " Goldilocks and the Three Bears · Traditional · Scene",
-      image: "/assets/easy/goldilocks.png",
+      image: "/assets/easy/goldilocks-and-the-three-bears.png",
     },
     {
       text: "The ugly duckling was teased by all the farmyard animals, but when he grew up he transformed into a graceful swan, the most beautiful bird of all.",
@@ -126,7 +126,7 @@ const PARAGRAPHS = {
     {
       text: "A young boy named Jack traded his cow for magic beans, and a giant beanstalk grew to the sky where a huge giant lived with a golden harp and hen.",
       source: " Jack and the Beanstalk · Traditional · Opening",
-      image: "/assets/easy/jackbeanstalk.png",
+      image: "/assets/easy/jack-and-the-beanstalk.png",
     },
     {
       text: "The little mermaid longed to live on land and fell in love with a prince, so she traded her voice to a sea witch for a chance to win his heart.",
@@ -146,7 +146,7 @@ const PARAGRAPHS = {
     {
       text: "Little Red Hen found some wheat and asked for help, but when nobody helped, she baked the bread all by herself and ate it with great satisfaction.",
       source: " The Little Red Hen · Traditional · Moral",
-      image: "/assets/easy/littleredhen.png",
+      image: "/assets/easy/the-little-red-hen.png",
     },
     {
       text: "The tortoise and the hare raced, and the slow tortoise won because the hare took a nap and underestimated his opponent's steady pace.",
@@ -156,37 +156,37 @@ const PARAGRAPHS = {
     {
       text: "The ant and the grasshopper: the ant worked hard all summer storing food while the grasshopper played, and when winter came, the grasshopper had nothing to eat.",
       source: " The Ant and the Grasshopper · Aesop's Fables · Moral",
-      image: "/assets/easy/antgrasshopper.png",
+      image: "/assets/easy/the-ant-and-the-grasshopper.png",
     },
     {
       text: "The town mouse and the country mouse visited each other, and each preferred their own home, finding peace in simplicity over luxury with danger.",
       source: " The Town Mouse and the Country Mouse · Aesop's Fables · Story",
-      image: "/assets/easy/towncountrymouse.png",
+      image: "/assets/easy/the-town-mouse-and-the-country-mouse.png",
     },
     {
       text: "The fox and the grapes: a hungry fox saw a bunch of grapes high on a vine, but after trying to reach them, he said they were sour and walked away.",
       source: " The Fox and the Grapes · Aesop's Fables · Moral",
-      image: "/assets/easy/foxgrapes.png",
+      image: "/assets/easy/the-fox-and-the-grapes.png",
     },
     {
       text: "The farmer and his sons: before dying, the farmer told his sons that treasure was buried in the fields, and they dug so much that they improved the soil and grew better crops.",
       source: " The Farmer and His Sons · Aesop's Fables · Story",
-      image: "/assets/easy/farmersons.png",
+      image: "/assets/easy/the-farmer-and-his-sons.png",
     },
     {
       text: "The dog and his shadow: a dog carrying a bone saw his reflection in the water and dropped his bone to grab the larger one, only to lose both.",
       source: " The Dog and His Shadow · Aesop's Fables · Moral",
-      image: "/assets/easy/dogshadow.png",
+      image: "/assets/easy/the-dog-and-his-shadow.png",
     },
     {
       text: "The goose that laid the golden eggs: a farmer was greedy and killed the goose to get all the gold at once, but found nothing and lost his daily treasure.",
       source: " The Goose that Laid the Golden Eggs · Aesop's Fables · Moral",
-      image: "/assets/easy/goosegoldeneggs.png",
+      image: "/assets/easy/the-goose-that-laid-the-golden-eggs.png",
     },
     {
       text: "The tiger, the Brahmin, and the jackal: a man was tricked by a tiger, but the clever jackal helped the man trap the tiger back in the cage.",
       source: " The Tiger, the Brahmin, and the Jackal · Indian Folktale · Story",
-      image: "/assets/easy/tigerbrahminjackal.png",
+      image: "/assets/easy/the-tiger-the-brahmin-and-the-jackal.png",
     },
     {
       text: "The monkey and the crocodile: a crocodile tried to trick a monkey into giving him his heart, but the monkey escaped and taught the crocodile a lesson.",
@@ -201,97 +201,97 @@ const PARAGRAPHS = {
     {
       text: "The hare with many friends: a hare claimed to have many friends, but when a wolf attacked, no one came to help, teaching that true friends are loyal.",
       source: " The Hare with Many Friends · Aesop's Fables · Moral",
-      image: "/assets/easy/harefriends.png",
+      image: "/assets/easy/the-hare-with-many-friends.png",
     },
     {
       text: "The crow and the pitcher: a thirsty crow dropped pebbles into a pitcher to raise the water level until he could drink, showing cleverness and persistence.",
       source: " The Crow and the Pitcher · Aesop's Fables · Story",
-      image: "/assets/easy/crowpitcher.png",
+      image: "/assets/easy/the-crow-and-the-pitcher.png",
     },
     {
       text: "The north wind and the sun: they argued who was stronger, and the sun won by shining warmly to make a traveler remove his coat, rather than forcing him.",
       source: " The North Wind and the Sun · Aesop's Fables · Moral",
-      image: "/assets/easy/northwindsun.png",
+      image: "/assets/easy/the-north-wind-and-the-sun.png",
     },
     {
       text: "The bundle of sticks: a father taught his sons that united they are strong, but divided they break easily, so they must stay together as a family.",
       source: " The Bundle of Sticks · Aesop's Fables · Moral",
-      image: "/assets/easy/bundlesticks.png",
+      image: "/assets/easy/the-bundle-of-sticks.png",
     },
     {
       text: "The ant and the dove: an ant saved a dove from a hunter by stinging him, and later the dove rescued the ant from drowning, showing kindness repaid.",
       source: " The Ant and the Dove · Aesop's Fables · Story",
-      image: "/assets/easy/antdove.png",
+      image: "/assets/easy/the-ant-and-the-dove.png",
     },
     {
       text: "The frog and the ox: a frog tried to puff up to be as big as an ox, but he burst, teaching that pride and envy can lead to disaster.",
       source: " The Frog and the Ox · Aesop's Fables · Moral",
-      image: "/assets/easy/frogox.png",
+      image: "/assets/easy/the-frog-and-the-ox.png",
     },
     {
       text: "The wolves and the sheep: the wolves proposed a truce if the sheep gave up their dogs, but without protection, the wolves soon attacked them.",
       source: " The Wolves and the Sheep · Aesop's Fables · Moral",
-      image: "/assets/easy/wolvessheep.png",
+      image: "/assets/easy/the-wolves-and-the-sheep.png",
     },
     {
       text: "The vain jackdaw: a bird dressed in peacock feathers to look beautiful, but the peacocks saw through the disguise and the jackdaw was shamed.",
       source: " The Vain Jackdaw · Aesop's Fables · Moral",
-      image: "/assets/easy/vainjackdaw.png",
+      image: "/assets/easy/the-vain-jackdaw.png",
     },
     {
       text: "The shepherd's boy and the wolf: the boy cried wolf so many times that when the wolf truly came, nobody believed him, and his sheep were lost.",
       source: " The Shepherd's Boy and the Wolf · Aesop's Fables · Story",
-      image: "/assets/easy/shepherdswolf.png",
+      image: "/assets/easy/the-shepherds-boy-and-the-wolf.png",
     },
     {
       text: "The oak and the reed: a reed bent in the storm while the mighty oak stood firm and was uprooted, showing that flexibility can be a strength.",
       source: " The Oak and the Reed · Aesop's Fables · Moral",
-      image: "/assets/easy/oakreed.png",
+      image: "/assets/easy/the-oak-and-the-reed.png",
     },
     {
       text: "The fisherman and the little fish: a fisherman caught a small fish that begged for release, promising to grow bigger, but the fisherman kept it, valuing the sure catch.",
       source: " The Fisherman and the Little Fish · Aesop's Fables · Moral",
-      image: "/assets/easy/fishermanfish.png",
+      image: "/assets/easy/the-fisherman-and-the-little-fish.png",
     },
     {
       text: "The monkey and the dolphin: a monkey convinced a dolphin to carry him to safety, but the dolphin discovered the monkey's lies and left him to drown.",
       source: " The Monkey and the Dolphin · Aesop's Fables · Story",
-      image: "/assets/easy/monkeydolphin.png",
+      image: "/assets/easy/the-monkey-and-the-dolphin.png",
     },
     {
       text: "The donkey and the grasshopper: a donkey wanted to sing like a grasshopper, but eating grasshoppers' food did not give him their voice, teaching we all have our own talents.",
       source: " The Donkey and the Grasshopper · Aesop's Fables · Moral",
-      image: "/assets/easy/donkeygrasshopper.png",
+      image: "/assets/easy/the-donkey-and-the-grasshopper.png",
     },
     {
       text: "The lion, the bear, and the fox: a lion and bear fought over a deer while a fox watched, and when they were exhausted, the fox stole the deer.",
       source: " The Lion, the Bear, and the Fox · Aesop's Fables · Story",
-      image: "/assets/easy/lionbearfox.png",
+      image: "/assets/easy/the-lion-the-bear-and-the-fox.png",
     },
     {
       text: "The horse and the stag: a horse asked a hunter for help to punish a stag, but ended up being enslaved by the hunter, regretting the deal.",
       source: " The Horse and the Stag · Aesop's Fables · Moral",
-      image: "/assets/easy/horsestag.png",
+      image: "/assets/easy/the-horse-and-the-stag.png",
     },
     {
       text: "The serpent and the file: a serpent tried to bite a file, thinking it was alive, but only damaged its teeth, showing that some things are not worth attacking.",
       source: " The Serpent and the File · Aesop's Fables · Moral",
-      image: "/assets/easy/serpentfile.png",
+      image: "/assets/easy/the-serpent-and-the-file.png",
     },
     {
       text: "The camel and the Arab: a camel asked to put his head in the tent to escape the cold, then his neck, then his whole body, eventually pushing the Arab out.",
       source: " The Camel and the Arab · Aesop's Fables · Story",
-      image: "/assets/easy/camelarab.png",
+      image: "/assets/easy/the-camel-and-the-arab.png",
     },
     {
       text: "The peacock and the crane: a peacock envied the crane's ability to fly, but the crane reminded him that beauty is not everything, and they each have their own gifts.",
       source: " The Peacock and the Crane · Aesop's Fables · Moral",
-      image: "/assets/easy/peacockcrane.png",
+      image: "/assets/easy/the-peacock-and-the-crane.png",
     },
     {
       text: "The wolf in sheep's clothing: a wolf disguised himself as a sheep to eat the flock, but the shepherd found him and killed him, teaching that evil cannot hide forever.",
       source: " The Wolf in Sheep's Clothing · Aesop's Fables · Moral",
-      image: "/assets/easy/wolfsheepclothing.png",
+      image: "/assets/easy/the-wolf-in-sheeps-clothing.png",
     },
   ],
   medium: [
@@ -506,7 +506,7 @@ const PARAGRAPHS = {
     {
       text: "A soldier returned home from the Great War changed forever, and in his hometown, he struggled to find meaning and connection in a world that had moved on without him.",
       source: " All Quiet on the Western Front · Erich Maria Remarque · Chapter 1",
-      image: "/assets/medium/allquietwesternfront.png",
+      image: "/assets/medium/all-quiet-on-the-western-front.png",
     },
     {
       text: "The narrative of the slave Frederick Douglass showed the brutal reality of bondage and the power of literacy, as he escaped and became a leader in the abolitionist movement.",
@@ -616,7 +616,7 @@ const PARAGRAPHS = {
     {
       text: "Quantum mechanics challenges classical determinism by asserting that particles exist in superpositions of states until measured, and the act of observation collapses these probabilities into a single outcome.",
       source: " Quantum Physics · Feynman Lectures · Vol III",
-      image: "/assets/hard/quantumphysics.png",
+      image: "/assets/hard/feynman-lectures-vol-iii.png",
     },
     {
       text: "The theory of evolution by natural selection explains the diversity of life through inherited variations, competition for resources, and differential reproductive success over vast timescales.",
@@ -671,7 +671,7 @@ const PARAGRAPHS = {
     {
       text: "The human genome project sequenced the entire human DNA, revealing approximately three billion base pairs and the location of over 20,000 protein-coding genes, opening new doors to personalized medicine.",
       source: " The Human Genome · Eric Lander · Scientific American",
-      image: "/assets/hard/humangenome.png",
+      image: "/assets/hard/the-human-genome.png",
     },
     {
       text: "Topological insulators are materials that behave as insulators in their interior but conduct electricity on their surface, a property arising from the topology of electronic band structures.",
@@ -801,7 +801,7 @@ const PARAGRAPHS = {
     {
       text: "In the realm of artificial intelligence, the Turing test measures a machine's ability to exhibit intelligent behavior equivalent to a human, a benchmark that has been debated since its inception.",
       source: " Computing Machinery and Intelligence · Alan Turing · 1950",
-      image: "/assets/hard/turingtest.png",
+      image: "/assets/hard/computing-machinery-and-intelligence.png",
     },
     {
       text: "The study of quantum computing utilizes qubits that exist in superposition and can be entangled, enabling computations that would be infeasible on classical computers, promising breakthroughs in cryptography and simulations.",
@@ -826,7 +826,7 @@ const PARAGRAPHS = {
     {
       text: "The study of exoplanets, planets orbiting other stars, has advanced rapidly with missions like Kepler, revealing a diversity of worlds, including super-Earths and hot Jupiters, challenging our solar system model.",
       source: " Exoplanets · Andrew Liddle · Part 1",
-      image: "/assets/hard/exoplanets.png",
+      image: "/assets/hard/exoplanets-astronomy.png",
     },
     {
       text: "The concept of modularity in evolutionary biology suggests that organisms are composed of semi-independent modules that can evolve separately, allowing for innovation and adaptation without disrupting overall function.",
