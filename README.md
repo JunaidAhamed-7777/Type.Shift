@@ -18,7 +18,7 @@ Type.Shift is a React-based typing speed test designed to help users improve typ
 
 The application provides multiple difficulty levels with typing passages drawn from books, scientific and technical subjects, and programming algorithms.
 
-* Hosted on https://typeshift-alpha2.vercel.app
+* Hosted on https://typeshiftt.vercel.app
 * No account is required to start a typing test.
 * Results include Words Per Minute (WPM), accuracy, and time taken.
 * Each test randomly selects a passage from the selected difficulty level.
