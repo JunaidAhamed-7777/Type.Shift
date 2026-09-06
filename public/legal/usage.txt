@@ -1,0 +1,35 @@
+TERMS OF USE
+
+Last updated: 2025-09-07
+
+1. Acceptance of Terms
+By using Type.Shift ("the Service"), you agree to these Terms of Use. If you do not agree, please do not use the Service.
+
+2. Description of Service
+Type.Shift is a free, web‑based typing speed test that provides random passages for users to type. It is offered "as is" and "as available" for educational and entertainment purposes.
+
+3. User Responsibilities
+You agree to:
+- Use the Service only for lawful purposes.
+- Not attempt to disrupt, overload, or gain unauthorised access to the Service or its underlying systems.
+- Not use the Service to transmit any harmful, defamatory, or illegal content.
+
+4. Intellectual Property
+All textual passages used in the Service are either in the public domain, used with permission, or properly attributed to their respective authors. The source code and visual design of the Service are the property of their respective owners and are available under open‑source licenses as indicated in the project repository.
+
+5. Disclaimer of Warranties
+The Service is provided without any warranties, express or implied. We do not guarantee that the Service will be uninterrupted, error‑free, or secure. Your use of the Service is at your own risk.
+
+6. Limitation of Liability
+To the maximum extent permitted by law, we are not liable for any direct, indirect, incidental, consequential, or special damages arising from your use of the Service, even if we have been advised of the possibility of such damages.
+
+7. Changes to the Terms
+We may revise these Terms at any time. The latest version will be posted at this URL. Your continued use of the Service after any changes constitutes your acceptance of the new Terms.
+
+8. Governing Law
+These Terms are governed by the laws of the jurisdiction in which the Service owner resides, without regard to its conflict of law provisions.
+
+9. Contact
+If you have questions about these Terms, please open an issue at https://github.com/JunaidAhamed-7777/Type.Shift or mail the owner at junuhammad2@gmail.com.
+
+---
