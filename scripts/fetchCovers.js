@@ -8,56 +8,56 @@ const __dirname = path.dirname(__filename);
 
 // Path to your paragraphs.js
 const PARAGRAPHS_PATH = path.join(__dirname, '../src/data/paragraphs.js');
+// Where images are stored – now pointing to the 'public' folder
+const ASSETS_ROOT = path.join(__dirname, '../public');
 
-// Where images are stored (relative to project root)
-const ASSETS_ROOT = path.join(__dirname, '../public/assets');
-
-// Read the paragraphs.js file (as a string)
+// Read paragraphs.js as string
 const fileContent = fs.readFileSync(PARAGRAPHS_PATH, 'utf8');
 
-// Extract the PARAGRAPHS object using eval (or better: use a module loader)
-// Since it's a JS module, we can use dynamic import if you're using ESM,
-// but for simplicity we'll parse it as text and extract the object.
-// A safer way: use a temporary module loader.
-
-// We'll use a function to evaluate the file content in a sandbox.
-// Alternatively, you can export PARAGRAPHS separately, but we'll parse.
+// Extract the PARAGRAPHS object
 function getParagraphs() {
-  // We'll use a simple regex to extract the object definition after 'const PARAGRAPHS = '
-  // This is a bit hacky but works for this structure.
   const match = fileContent.match(/const PARAGRAPHS = ({[\s\S]*?});\s*export default PARAGRAPHS/);
   if (!match) throw new Error('Could not find PARAGRAPHS definition');
-  // Use Function constructor to safely evaluate
   const func = new Function(`return ${match[1]}`);
   return func();
 }
 
 const PARAGRAPHS = getParagraphs();
 
-// Helper to parse source field: format is " Title · Author · Section" (sometimes different)
+// Parse source field: "Title · Author · Section"
 function parseSource(source) {
-  // Remove leading space
   const clean = source.trim();
-  // Split by '·' (or '•') and take first part as title, second as author
   const parts = clean.split('·').map(s => s.trim());
   let title = parts[0] || '';
   let author = parts[1] || '';
-  // Sometimes the source is just "Title · Author" without section
   return { title, author };
 }
 
-// Build the OpenLibrary cover URL
-// Available sizes: S, M, L (small, medium, large)
-function getCoverUrl(title, author, size = 'M') {
-  // Use OpenLibrary cover API: https://covers.openlibrary.org/b/title/{title}?default=false
-  // We can also include author for better matching: b/title/{title}?author={author}
-  const base = 'https://covers.openlibrary.org/b/title/';
-  const query = new URLSearchParams({ default: 'false', size });
-  if (author) query.set('author', author);
-  return `${base}${encodeURIComponent(title)}?${query.toString()}`;
+// Search OpenLibrary for the book and return cover_id (if found)
+async function findCoverId(title, author) {
+  try {
+    const searchUrl = 'https://openlibrary.org/search.json';
+    const params = new URLSearchParams({
+      title: title,
+      author: author,
+      limit: 1,
+    });
+    const response = await axios.get(`${searchUrl}?${params.toString()}`);
+    const data = response.data;
+    if (data.docs && data.docs.length > 0) {
+      const doc = data.docs[0];
+      if (doc.cover_i) {
+        return doc.cover_i;
+      }
+    }
+    return null;
+  } catch (err) {
+    console.warn(`Search failed for "${title}": ${err.message}`);
+    return null;
+  }
 }
 
-// Download a file and save it
+// Download image from a URL and save to filepath
 async function downloadImage(url, filepath) {
   const response = await axios.get(url, { responseType: 'stream' });
   const writer = fs.createWriteStream(filepath);
@@ -70,18 +70,15 @@ async function downloadImage(url, filepath) {
 
 // Main function
 async function fetchAllCovers() {
-  // Collect all entries from all categories
   const allEntries = [];
   for (const [category, entries] of Object.entries(PARAGRAPHS)) {
     if (!Array.isArray(entries)) continue;
-    // Only process if they have an image property (code doesn't)
     entries.forEach(entry => {
       if (entry.image) {
         allEntries.push({
           ...entry,
           category,
-          // Remove leading slash for path building
-          imagePath: entry.image.startsWith('/') ? entry.image.slice(1) : entry.image,
+          // Keep the original image path for display, but we'll build file path differently
         });
       }
     });
@@ -99,35 +96,51 @@ async function fetchAllCovers() {
       continue;
     }
 
-    // Build local file path
-    const filePath = path.join(ASSETS_ROOT, entry.imagePath);
+    // Build correct file path: public/ + (image path without leading slash)
+    // e.g. entry.image = "/assets/easy/littleredridinghood.png"
+    //      -> removes leading "/" -> "assets/easy/littleredridinghood.png"
+    const relativePath = entry.image.slice(1); // remove leading "/"
+    const filePath = path.join(ASSETS_ROOT, relativePath);
     const dir = path.dirname(filePath);
 
-    // Check if file already exists
+    // Skip if already exists
     if (fs.existsSync(filePath)) {
-      console.log(`File exists: ${entry.imagePath}, skipping.`);
+      console.log(`File exists: ${relativePath}, skipping.`);
       skipped++;
       continue;
     }
 
-    // Create directory if it doesn't exist
+    // Create directory if needed
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    const url = getCoverUrl(title, author);
-    try {
-      await downloadImage(url, filePath);
-      console.log(`Downloaded: ${entry.imagePath} (${title})`);
-      success++;
-    } catch (err) {
-      console.error(`Failed to download for ${entry.imagePath}: ${err.message}`);
-      failed++;
-      // Optionally create a placeholder or fallback
+    // Try to get cover_id via search
+    let coverId = await findCoverId(title, author);
+    let url = null;
+
+    if (coverId) {
+      url = `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
+    } else {
+      // Fallback to old title-based endpoint (works sometimes)
+      const base = 'https://covers.openlibrary.org/b/title/';
+      const query = new URLSearchParams({ default: 'false', size: 'M' });
+      if (author) query.set('author', author);
+      url = `${base}${encodeURIComponent(title)}?${query.toString()}`;
     }
 
-    // Add a small delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 200));
+    try {
+      await downloadImage(url, filePath);
+      console.log(`Downloaded: ${relativePath} (${title})`);
+      success++;
+    } catch (err) {
+      console.error(`Failed to download for ${relativePath}: ${err.message}`);
+      failed++;
+      // Optionally create a placeholder image here
+    }
+
+    // Delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 300));
   }
 
   console.log(`Done. Success: ${success}, Skipped (already exist): ${skipped}, Failed: ${failed}`);
