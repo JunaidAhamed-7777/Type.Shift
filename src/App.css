@@ -1027,3 +1027,9 @@ html {
     overflow-y: auto;
   }
 }
+
+@media (max-width: 600px) {
+  .social-links {
+    margin-bottom: 0.5rem;
+  }
+}
