@@ -1029,7 +1029,24 @@ html {
 }
 
 @media (max-width: 600px) {
-  .social-links {
-    margin-bottom: 0.5rem;
+  .app {
+    padding: 1.2rem 0.8rem 1rem;
   }
+
+  .app.game-active {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .typing-box {
+    padding: 1.2rem;
+  }
+
+  .hidden-input {
+    padding: 1.2rem;
+  }
+
+  /* rest of your existing mobile CSS */
 }
