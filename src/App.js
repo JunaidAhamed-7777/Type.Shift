@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
 import { FaGithub } from "react-icons/fa";
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from "@vercel/analytics/react";
 import PARAGRAPHS from "./data/paragraphs";
 import DarkVeil from "./components/DarkVeil";
 
@@ -20,68 +20,106 @@ function getRandomParagraph(difficulty) {
 
   const used = usedIndices[difficulty];
 
-  // Build list of available indices (not used yet)
   const available = [];
 
   for (let i = 0; i < list.length; i++) {
     if (!used.has(i)) available.push(i);
   }
 
-  // If all have been used, reset and start fresh
   if (available.length === 0) {
     used.clear();
 
-    // Now all indices are available
     for (let i = 0; i < list.length; i++) {
       available.push(i);
     }
   }
 
-  // Pick a random available index
-  const randIdx = available[Math.floor(Math.random() * available.length)];
+  const randIdx =
+    available[Math.floor(Math.random() * available.length)];
 
-  // Remember it for this session
   used.add(randIdx);
 
   return list[randIdx];
 }
 
-// ─── Updated performance rating ──────────────────────────────────────
+// ─── Performance rating ─────────────────────────────────────────────
 function getPerformanceLabel(wpm, accuracy, timeTaken) {
   const MAX_WPM = 80;
-  const TOTAL_TIME = 60; // seconds
+  const TOTAL_TIME = 60;
 
-  // Normalise each metric to a 0–100 scale
-  const wpmScore = Math.min(wpm, MAX_WPM) / MAX_WPM * 100;
+  const wpmScore =
+    (Math.min(wpm, MAX_WPM) / MAX_WPM) * 100;
+
   const accScore = accuracy;
-  const timeScore = Math.max(0, 100 - (timeTaken / TOTAL_TIME) * 100);
 
-  // Composite score
-  const composite = (wpmScore + accScore + timeScore) / 3;
+  const timeScore = Math.max(
+    0,
+    100 - (timeTaken / TOTAL_TIME) * 100
+  );
 
-  if (composite >= 80) return { label: "Expert", color: "#ff6b35" };
-  if (composite >= 60) return { label: "Advanced", color: "#39ff14" };
-  if (composite >= 40) return { label: "Intermediate", color: "#00d4ff" };
-  if (composite >= 20) return { label: "Beginner", color: "#ffd700" };
+  const composite =
+    (wpmScore + accScore + timeScore) / 3;
 
-  return { label: "Keep Practicing", color: "#a0a0a0" };
+  if (composite >= 80) {
+    return {
+      label: "Expert",
+      color: "#ff6b35",
+    };
+  }
+
+  if (composite >= 60) {
+    return {
+      label: "Advanced",
+      color: "#39ff14",
+    };
+  }
+
+  if (composite >= 40) {
+    return {
+      label: "Intermediate",
+      color: "#00d4ff",
+    };
+  }
+
+  if (composite >= 20) {
+    return {
+      label: "Beginner",
+      color: "#ffd700",
+    };
+  }
+
+  return {
+    label: "Keep Practicing",
+    color: "#a0a0a0",
+  };
 }
 
-// ─── Timer ────────────────────────────────────────────────────────────
+// ─── Timer ──────────────────────────────────────────────────────────
 function Timer({ timeLeft, totalTime }) {
   const pct = (timeLeft / totalTime) * 100;
   const isUrgent = timeLeft <= 10;
 
   return (
     <div className="timer-wrapper">
-      <div className={`timer-display ${isUrgent ? "urgent" : ""}`}>
-        <span className="timer-number">{timeLeft}</span>
-        <span className="timer-label">seconds</span>
+      <div
+        className={`timer-display ${
+          isUrgent ? "urgent" : ""
+        }`}
+      >
+        <span className="timer-number">
+          {timeLeft}
+        </span>
+
+        <span className="timer-label">
+          seconds
+        </span>
       </div>
 
       <div className="timer-bar-bg">
         <div
-          className={`timer-bar-fill ${isUrgent ? "urgent" : ""}`}
+          className={`timer-bar-fill ${
+            isUrgent ? "urgent" : ""
+          }`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -89,13 +127,13 @@ function Timer({ timeLeft, totalTime }) {
   );
 }
 
-// ─── Live Stats ───────────────────────────────────────────────────────
+// ─── Live Stats ─────────────────────────────────────────────────────
 function LiveStats({
   wpm,
   accuracy,
   correctChars,
   totalTyped,
-  onRestart
+  onRestart,
 }) {
   return (
     <div className="live-stats">
@@ -105,28 +143,37 @@ function LiveStats({
       </div>
 
       <div className="stat-pill">
-        <span className="stat-val">{accuracy}%</span>
+        <span className="stat-val">
+          {accuracy}%
+        </span>
         <span className="stat-key">ACC</span>
       </div>
 
       <div className="stat-pill">
-        <span className="stat-val">{correctChars}</span>
+        <span className="stat-val">
+          {correctChars}
+        </span>
         <span className="stat-key">Correct</span>
       </div>
 
       <div className="stat-pill">
-        <span className="stat-val">{totalTyped}</span>
+        <span className="stat-val">
+          {totalTyped}
+        </span>
         <span className="stat-key">Typed</span>
       </div>
 
-      <button className="reset-btn" onClick={onRestart}>
+      <button
+        className="reset-btn"
+        onClick={onRestart}
+      >
         ↻
       </button>
     </div>
   );
 }
 
-// ─── Welcome Lightbox ─────────────────────────────────────────────────
+// ─── Welcome Lightbox ───────────────────────────────────────────────
 function WelcomeLightbox({ onClose }) {
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -153,26 +200,33 @@ function WelcomeLightbox({ onClose }) {
 
         <div className="lightbox-content">
           <h2 id="lightbox-title">
-            Test your typing speed and accuracy with Type.Shift
+            Test your typing speed and accuracy with
+            Type.Shift
           </h2>
 
           <p>
-            The <span className="lightbox-green">free</span> online typing
-            speed tester.
+            The{" "}
+            <span className="lightbox-green">
+              free
+            </span>{" "}
+            online typing speed tester.
           </p>
 
           <p>
-            Choose from different difficulty levels and measure your words
-            per minute (WPM), accuracy, and typing performance.
+            Choose from different difficulty levels
+            and measure your words per minute (WPM),
+            accuracy, and typing performance.
           </p>
 
           <p>
-            Practice with passages from books, scientific texts, and
-            programming algorithms.
+            Practice with passages from books,
+            scientific texts, and programming
+            algorithms.
           </p>
 
           <p className="lightbox-red">
-            No account is required to start a typing test.
+            No account is required to start a typing
+            test.
           </p>
         </div>
       </div>
@@ -180,19 +234,21 @@ function WelcomeLightbox({ onClose }) {
   );
 }
 
-// ─── Legal Lightbox ───────────────────────────────────────────────────
+// ─── Legal Lightbox ─────────────────────────────────────────────────
 function LegalLightbox({ type, onClose }) {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const title = type === "privacy"
-    ? "Privacy Policy"
-    : "Terms of Use";
+  const title =
+    type === "privacy"
+      ? "Privacy Policy"
+      : "Terms of Use";
 
-  const filePath = type === "privacy"
-    ? "/legal/privacy.txt"
-    : "/legal/usage.txt";
+  const filePath =
+    type === "privacy"
+      ? "/legal/privacy.txt"
+      : "/legal/usage.txt";
 
   useEffect(() => {
     let cancelled = false;
@@ -204,7 +260,9 @@ function LegalLightbox({ type, onClose }) {
     fetch(filePath)
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Failed to load ${filePath}`);
+          throw new Error(
+            `Failed to load ${filePath}`
+          );
         }
 
         return response.text();
@@ -278,13 +336,13 @@ function LegalLightbox({ type, onClose }) {
   );
 }
 
-// ─── Typing Box ───────────────────────────────────────────────────────
+// ─── Typing Box ─────────────────────────────────────────────────────
 function TypingBox({
   paragraph,
   userInput,
   onInput,
   isFinished,
-  inputRef
+  inputRef,
 }) {
   const boxRef = useRef(null);
 
@@ -302,9 +360,10 @@ function TypingBox({
       let cls = "char-pending";
 
       if (i < userInput.length) {
-        cls = userInput[i] === char
-          ? "char-correct"
-          : "char-wrong";
+        cls =
+          userInput[i] === char
+            ? "char-correct"
+            : "char-wrong";
       } else if (i === userInput.length) {
         cls = "char-cursor";
       }
@@ -321,7 +380,9 @@ function TypingBox({
     <div className="typing-box" ref={boxRef}>
       <div
         className="text-display"
-        onClick={() => inputRef.current?.focus()}
+        onClick={() =>
+          inputRef.current?.focus()
+        }
       >
         {renderText()}
       </div>
@@ -330,7 +391,9 @@ function TypingBox({
         ref={inputRef}
         className="hidden-input"
         value={userInput}
-        onChange={(e) => onInput(e.target.value)}
+        onChange={(e) =>
+          onInput(e.target.value)
+        }
         disabled={isFinished}
         spellCheck={false}
         autoComplete="off"
@@ -348,20 +411,21 @@ function TypingBox({
   );
 }
 
-// ─── Result Screen ────────────────────────────────────────────────────
+// ─── Result Screen ──────────────────────────────────────────────────
 function Result({
   wpm,
   accuracy,
   timeTaken,
   source,
   image,
-  onRestart
+  onRestart,
 }) {
-  const { label, color } = getPerformanceLabel(
-    wpm,
-    accuracy,
-    timeTaken
-  );
+  const { label, color } =
+    getPerformanceLabel(
+      wpm,
+      accuracy,
+      timeTaken
+    );
 
   return (
     <div className="result-screen">
@@ -369,7 +433,7 @@ function Result({
         className="result-badge"
         style={{
           borderColor: color,
-          color
+          color,
         }}
       >
         {label}
@@ -445,13 +509,15 @@ function Result({
   );
 }
 
-// ─── Matrix Rain Effect ───────────────────────────────────────────────
+// ─── Matrix Rain Effect ─────────────────────────────────────────────
 /*
 MATRIX RAIN EFFECT
 CREDITS ALL BELONG TO https://github.com/javascriptacademy-stash/digital-rain
 */
 function startMatrix(canvasId) {
-  const canvas = document.getElementById(canvasId);
+  const canvas =
+    document.getElementById(canvasId);
+
   if (!canvas) return;
 
   const context = canvas.getContext("2d");
@@ -464,14 +530,21 @@ function startMatrix(canvasId) {
 
   const latin = "AVANTHIKA";
   const nums = "0123456789";
-  const alphabet = katakana + latin + nums;
+  const alphabet =
+    katakana + latin + nums;
 
   const fontSize = 16;
-  const columns = canvas.width / fontSize;
-  const rainDrops = Array(Math.floor(columns)).fill(1);
+  const columns =
+    canvas.width / fontSize;
+
+  const rainDrops = Array(
+    Math.floor(columns)
+  ).fill(1);
 
   const draw = () => {
-    context.fillStyle = "rgba(0, 0, 0, 0.05)";
+    context.fillStyle =
+      "rgba(0, 0, 0, 0.05)";
+
     context.fillRect(
       0,
       0,
@@ -479,13 +552,24 @@ function startMatrix(canvasId) {
       canvas.height
     );
 
-    context.fillStyle = "rgb(83, 169, 43)";
-    context.font = fontSize + "px monospace";
+    context.fillStyle =
+      "rgb(83, 169, 43)";
 
-    for (let i = 0; i < rainDrops.length; i++) {
-      const text = alphabet.charAt(
-        Math.floor(Math.random() * alphabet.length)
-      );
+    context.font =
+      fontSize + "px monospace";
+
+    for (
+      let i = 0;
+      i < rainDrops.length;
+      i++
+    ) {
+      const text =
+        alphabet.charAt(
+          Math.floor(
+            Math.random() *
+              alphabet.length
+          )
+        );
 
       context.fillText(
         text,
@@ -494,7 +578,8 @@ function startMatrix(canvasId) {
       );
 
       if (
-        rainDrops[i] * fontSize > canvas.height &&
+        rainDrops[i] * fontSize >
+          canvas.height &&
         Math.random() > 0.975
       ) {
         rainDrops[i] = 0;
@@ -507,36 +592,67 @@ function startMatrix(canvasId) {
   return setInterval(draw, 30);
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────
+// ─── Main ───────────────────────────────────────────────────────────
 export default function App() {
   const TOTAL_TIME = 60;
 
-  const [showLightbox, setShowLightbox] = useState(true);
-  const [legalType, setLegalType] = useState(null);
+  /*
+   * WPM stabilization window.
+   *
+   * During the first few seconds, calculating WPM from
+   * the entire elapsed time produces mathematically correct
+   * but visually useless spikes because the denominator is
+   * extremely small.
+   *
+   * We therefore blend the real elapsed-time WPM with a
+   * short rolling typing-speed measurement during the
+   * startup period.
+   */
+  const WPM_STABILIZATION_TIME = 3000;
 
-  const [difficulty, setDifficulty] = useState("medium");
+  const [showLightbox, setShowLightbox] =
+    useState(true);
 
-  const [paragraphData, setParagraphData] = useState(() =>
-    getRandomParagraph("medium")
-  );
+  const [legalType, setLegalType] =
+    useState(null);
+
+  const [difficulty, setDifficulty] =
+    useState("medium");
+
+  const [paragraphData, setParagraphData] =
+    useState(() =>
+      getRandomParagraph("medium")
+    );
 
   const paragraph = paragraphData.text;
 
-  const [userInput, setUserInput] = useState("");
+  const [userInput, setUserInput] =
+    useState("");
 
   /*
-   * elapsedMs is deliberately separate from timeLeft.
+   * elapsedMs is the exact elapsed test time.
    *
-   * timeLeft is the user-facing countdown.
-   * elapsedMs is the high-precision value used for WPM.
-   *
-   * This prevents WPM from being affected by the 1-second
-   * resolution of the visible countdown.
+   * It is intentionally separate from timeLeft because
+   * timeLeft is only a user-facing whole-second countdown.
    */
-  const [elapsedMs, setElapsedMs] = useState(0);
+  const [elapsedMs, setElapsedMs] =
+    useState(0);
 
-  const [isRunning, setIsRunning] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
+  /*
+   * Tracks the WPM value shown on screen.
+   *
+   * Keeping this separate from elapsedMs allows the display
+   * to remain stable between timer updates and prevents
+   * React render timing from influencing the calculation.
+   */
+  const [displayWpm, setDisplayWpm] =
+    useState(0);
+
+  const [isRunning, setIsRunning] =
+    useState(false);
+
+  const [isFinished, setIsFinished] =
+    useState(false);
 
   // Exact timestamp of the first keystroke.
   const startTimeRef = useRef(null);
@@ -544,11 +660,24 @@ export default function App() {
   // Exact timestamp when the test finishes.
   const endTimeRef = useRef(null);
 
+  /*
+   * Stores recent typing samples.
+   *
+   * Each sample contains:
+   * - timestamp
+   * - correct character count
+   *
+   * These samples allow the live WPM to be calculated from
+   * the user's recent typing pace instead of dividing by an
+   * extremely small total elapsed time.
+   */
+  const wpmSamplesRef = useRef([]);
+
   const inputRef = useRef(null);
   const timerRef = useRef(null);
   const wpmUpdateRef = useRef(null);
 
-  // ─── Matrix result effect ──────────────────────────────────────────
+  // ─── Matrix result effect ─────────────────────────────────────────
   useEffect(() => {
     let rain;
 
@@ -561,44 +690,167 @@ export default function App() {
     };
   }, [isFinished]);
 
-  // ─── Character statistics ──────────────────────────────────────────
+  // ─── Character statistics ─────────────────────────────────────────
   const correctChars = userInput
     .split("")
-    .filter((ch, i) => ch === paragraph[i])
-    .length;
+    .filter(
+      (ch, i) => ch === paragraph[i]
+    ).length;
 
   const totalTyped = userInput.length;
 
-  // ─── Accurate WPM calculation ──────────────────────────────────────
-  /*
-   * Standard WPM formula:
-   *
-   *     WPM = correct characters / 5 / elapsed minutes
-   *
-   * Using correct characters gives us NET WPM.
-   *
-   * performance.now() gives sub-millisecond timing precision
-   * and is much more appropriate for measuring typing speed
-   * than calculating elapsed time from the integer countdown.
-   */
-  const elapsedMinutes = elapsedMs / 60000;
-
-  const wpm =
-    elapsedMinutes > 0
-      ? Math.round(
-          (correctChars / 5) / elapsedMinutes
-        )
-      : 0;
-
-  // ─── Accuracy calculation ──────────────────────────────────────────
+  // ─── Accuracy calculation ─────────────────────────────────────────
   const accuracy =
     totalTyped > 0
       ? Math.round(
-          (correctChars / totalTyped) * 100
+          (correctChars / totalTyped) *
+            100
         )
       : 100;
 
-  // ─── Display time ──────────────────────────────────────────────────
+  // ─── Live WPM calculation ─────────────────────────────────────────
+  /*
+   * Calculate WPM using a recent rolling window.
+   *
+   * The rolling window prevents the first few keystrokes
+   * from dominating the displayed speed.
+   *
+   * Once enough time has elapsed, WPM transitions to the
+   * normal full-test calculation.
+   */
+  const calculateLiveWpm = useCallback(
+    (correctCount, elapsed) => {
+      if (
+        !startTimeRef.current ||
+        elapsed <= 0 ||
+        correctCount <= 0
+      ) {
+        return 0;
+      }
+
+      const elapsedSeconds =
+        elapsed / 1000;
+
+      /*
+       * For the first 3 seconds, use a rolling window
+       * whose minimum duration is 1 second.
+       *
+       * This prevents values such as:
+       *
+       * 10 chars / 0.1 seconds = 1200 WPM
+       *
+       * while still responding quickly to actual typing.
+       */
+      if (
+        elapsedSeconds <
+        WPM_STABILIZATION_TIME / 1000
+      ) {
+        const now =
+          performance.now();
+
+        const samples =
+          wpmSamplesRef.current;
+
+        /*
+         * Keep only samples from the most recent
+         * stabilization window.
+         */
+        const windowStart =
+          now -
+          WPM_STABILIZATION_TIME;
+
+        while (
+          samples.length > 0 &&
+          samples[0].time < windowStart
+        ) {
+          samples.shift();
+        }
+
+        /*
+         * We need a meaningful time interval before
+         * calculating rolling WPM.
+         */
+        if (samples.length < 2) {
+          return 0;
+        }
+
+        const first =
+          samples[0];
+
+        const last =
+          samples[samples.length - 1];
+
+        const windowMs =
+          last.time - first.time;
+
+        /*
+         * Never calculate a speed over an interval
+         * smaller than 1 second.
+         */
+        const effectiveWindowMs =
+          Math.max(windowMs, 1000);
+
+        const charsTyped =
+          Math.max(
+            0,
+            last.correctChars -
+              first.correctChars
+          );
+
+        /*
+         * If the sample interval is shorter than one
+         * second, include the current cumulative progress
+         * while using the minimum one-second denominator.
+         */
+        const effectiveChars =
+          windowMs < 1000
+            ? last.correctChars
+            : charsTyped;
+
+        const minutes =
+          effectiveWindowMs / 60000;
+
+        return Math.round(
+          (effectiveChars / 5) /
+            minutes
+        );
+      }
+
+      /*
+       * After the startup period, use the standard
+       * full-test NET WPM calculation.
+       */
+      const elapsedMinutes =
+        elapsed / 60000;
+
+      return Math.round(
+        (correctCount / 5) /
+          elapsedMinutes
+      );
+    },
+    []
+  );
+
+  // ─── Display WPM ──────────────────────────────────────────────────
+  /*
+   * The actual WPM used by the result screen is always the
+   * exact full-test calculation.
+   *
+   * displayWpm is only the live value shown while typing.
+   */
+  const finalWpm =
+    elapsedMs > 0
+      ? Math.round(
+          (correctChars / 5) /
+            (elapsedMs / 60000)
+        )
+      : 0;
+
+  const wpm = isFinished
+    ? finalWpm
+    : displayWpm;
+
+  // ─── Display time ─────────────────────────────────────────────────
   const timeTaken = Math.min(
     TOTAL_TIME,
     Math.round(elapsedMs / 1000)
@@ -606,10 +858,11 @@ export default function App() {
 
   const timeLeft = Math.max(
     0,
-    TOTAL_TIME - Math.floor(elapsedMs / 1000)
+    TOTAL_TIME -
+      Math.floor(elapsedMs / 1000)
   );
 
-  // ─── High-precision timer ───────────────────────────────────────────
+  // ─── High-precision timer ─────────────────────────────────────────
   useEffect(() => {
     if (!isRunning) {
       clearInterval(timerRef.current);
@@ -617,23 +870,67 @@ export default function App() {
       return;
     }
 
-    /*
-     * Update elapsed time frequently enough that live WPM
-     * feels responsive without rendering on every animation frame.
-     */
     const updateElapsed = () => {
-      if (startTimeRef.current === null) return;
+      if (startTimeRef.current === null) {
+        return;
+      }
 
-      const now = performance.now();
-      const elapsed = now - startTimeRef.current;
+      const now =
+        performance.now();
 
-      if (elapsed >= TOTAL_TIME * 1000) {
-        setElapsedMs(TOTAL_TIME * 1000);
+      const elapsed =
+        now -
+        startTimeRef.current;
 
-        endTimeRef.current = now;
+      if (
+        elapsed >=
+        TOTAL_TIME * 1000
+      ) {
+        const exactElapsed =
+          TOTAL_TIME * 1000;
 
-        clearInterval(timerRef.current);
-        clearInterval(wpmUpdateRef.current);
+        setElapsedMs(
+          exactElapsed
+        );
+
+        /*
+         * At the end of the test, always use the
+         * exact final WPM instead of the stabilized
+         * live value.
+         */
+        const finalElapsedMinutes =
+          exactElapsed / 60000;
+
+        const finalCorrectChars =
+          userInput
+            .split("")
+            .filter(
+              (ch, i) =>
+                ch === paragraph[i]
+            ).length;
+
+        const finalWpm =
+          finalElapsedMinutes > 0
+            ? Math.round(
+                (finalCorrectChars / 5) /
+                  finalElapsedMinutes
+              )
+            : 0;
+
+        setDisplayWpm(
+          finalWpm
+        );
+
+        endTimeRef.current =
+          now;
+
+        clearInterval(
+          timerRef.current
+        );
+
+        clearInterval(
+          wpmUpdateRef.current
+        );
 
         setIsFinished(true);
         setIsRunning(false);
@@ -642,128 +939,285 @@ export default function App() {
       }
 
       setElapsedMs(elapsed);
+
+      const currentCorrectChars =
+        userInput
+          .split("")
+          .filter(
+            (ch, i) =>
+              ch === paragraph[i]
+          ).length;
+
+      const liveWpm =
+        calculateLiveWpm(
+          currentCorrectChars,
+          elapsed
+        );
+
+      setDisplayWpm(
+        liveWpm
+      );
     };
 
     updateElapsed();
 
-    timerRef.current = setInterval(
-      updateElapsed,
-      100
-    );
+    timerRef.current =
+      setInterval(
+        updateElapsed,
+        100
+      );
 
-    wpmUpdateRef.current = timerRef.current;
+    wpmUpdateRef.current =
+      timerRef.current;
 
     return () => {
-      clearInterval(timerRef.current);
-      clearInterval(wpmUpdateRef.current);
-    };
-  }, [isRunning]);
+      clearInterval(
+        timerRef.current
+      );
 
-  // ─── Auto-focus hidden textarea on mount ─────────────────────────────
+      clearInterval(
+        wpmUpdateRef.current
+      );
+    };
+  }, [
+    isRunning,
+    calculateLiveWpm,
+    paragraph,
+    userInput,
+  ]);
+
+  // ─── Auto-focus hidden textarea ───────────────────────────────────
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // ─── Handle typing input ────────────────────────────────────────────
-  const handleInput = useCallback(
-    (val) => {
-      if (isFinished) return;
+  // ─── Handle typing input ───────────────────────────────────────────
+  const handleInput =
+    useCallback(
+      (val) => {
+        if (isFinished) return;
 
-      /*
-       * Start timing from the exact moment of the first
-       * actual input.
-       */
-      if (!isRunning && val.length > 0) {
-        const now = performance.now();
+        /*
+         * Start timing exactly when the first character
+         * is entered.
+         */
+        if (
+          !isRunning &&
+          val.length > 0
+        ) {
+          const now =
+            performance.now();
 
-        startTimeRef.current = now;
-        endTimeRef.current = null;
+          startTimeRef.current =
+            now;
 
-        setElapsedMs(0);
-        setIsRunning(true);
-      }
+          endTimeRef.current =
+            null;
 
-      setUserInput(val);
+          wpmSamplesRef.current =
+            [
+              {
+                time: now,
+                correctChars: 0,
+              },
+            ];
 
-      /*
-       * Finish immediately when the entire passage has
-       * been typed.
-       */
-      if (val.length >= paragraph.length) {
-        const now = performance.now();
-
-        if (startTimeRef.current !== null) {
-          const exactElapsed = Math.min(
-            TOTAL_TIME * 1000,
-            now - startTimeRef.current
-          );
-
-          setElapsedMs(exactElapsed);
+          setElapsedMs(0);
+          setDisplayWpm(0);
+          setIsRunning(true);
         }
 
-        endTimeRef.current = now;
+        /*
+         * Calculate the number of correct characters
+         * for the new input value.
+         */
+        const newCorrectChars =
+          val
+            .split("")
+            .filter(
+              (ch, i) =>
+                ch === paragraph[i]
+            ).length;
 
-        clearInterval(timerRef.current);
-        clearInterval(wpmUpdateRef.current);
+        /*
+         * Record a sample immediately on every input.
+         *
+         * These samples are used only for the live
+         * stabilized WPM calculation.
+         */
+        if (
+          startTimeRef.current !==
+            null &&
+          val.length > 0
+        ) {
+          wpmSamplesRef.current.push(
+            {
+              time:
+                performance.now(),
+              correctChars:
+                newCorrectChars,
+            }
+          );
+        }
 
-        setIsFinished(true);
-        setIsRunning(false);
-      }
-    },
-    [isRunning, isFinished, paragraph]
-  );
+        setUserInput(val);
 
-  // ─── Reset everything ───────────────────────────────────────────────
-  const handleRestart = useCallback(() => {
-    clearInterval(timerRef.current);
-    clearInterval(wpmUpdateRef.current);
+        /*
+         * Finish immediately when the complete
+         * passage has been typed.
+         */
+        if (
+          val.length >=
+          paragraph.length
+        ) {
+          const now =
+            performance.now();
 
-    const newParagraph =
-      getRandomParagraph(difficulty);
+          if (
+            startTimeRef.current !==
+            null
+          ) {
+            const exactElapsed =
+              Math.min(
+                TOTAL_TIME * 1000,
+                now -
+                  startTimeRef.current
+              );
 
-    setParagraphData(newParagraph);
-    setUserInput("");
+            setElapsedMs(
+              exactElapsed
+            );
 
-    setElapsedMs(0);
+            /*
+             * The final result is never based on
+             * the rolling WPM. It uses the exact
+             * elapsed duration of the entire test.
+             */
+            const elapsedMinutes =
+              exactElapsed /
+              60000;
 
-    setIsRunning(false);
-    setIsFinished(false);
+            const exactFinalWpm =
+              elapsedMinutes > 0
+                ? Math.round(
+                    (newCorrectChars / 5) /
+                      elapsedMinutes
+                  )
+                : 0;
 
-    startTimeRef.current = null;
-    endTimeRef.current = null;
+            setDisplayWpm(
+              exactFinalWpm
+            );
+          }
 
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
-  }, [difficulty]);
+          endTimeRef.current =
+            now;
 
-  // ─── Change difficulty and reset ────────────────────────────────────
+          clearInterval(
+            timerRef.current
+          );
+
+          clearInterval(
+            wpmUpdateRef.current
+          );
+
+          setIsFinished(true);
+          setIsRunning(false);
+        }
+      },
+      [
+        isRunning,
+        isFinished,
+        paragraph,
+      ]
+    );
+
+  // ─── Reset everything ──────────────────────────────────────────────
+  const handleRestart =
+    useCallback(() => {
+      clearInterval(
+        timerRef.current
+      );
+
+      clearInterval(
+        wpmUpdateRef.current
+      );
+
+      const newParagraph =
+        getRandomParagraph(
+          difficulty
+        );
+
+      setParagraphData(
+        newParagraph
+      );
+
+      setUserInput("");
+
+      setElapsedMs(0);
+
+      setDisplayWpm(0);
+
+      setIsRunning(false);
+      setIsFinished(false);
+
+      startTimeRef.current =
+        null;
+
+      endTimeRef.current =
+        null;
+
+      wpmSamplesRef.current =
+        [];
+
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+    }, [difficulty]);
+
+  // ─── Change difficulty and reset ───────────────────────────────────
   const handleDifficulty = (d) => {
     setDifficulty(d);
 
-    clearInterval(timerRef.current);
-    clearInterval(wpmUpdateRef.current);
+    clearInterval(
+      timerRef.current
+    );
+
+    clearInterval(
+      wpmUpdateRef.current
+    );
 
     const newParagraph =
       getRandomParagraph(d);
 
-    setParagraphData(newParagraph);
+    setParagraphData(
+      newParagraph
+    );
+
     setUserInput("");
 
     setElapsedMs(0);
 
+    setDisplayWpm(0);
+
     setIsRunning(false);
     setIsFinished(false);
 
-    startTimeRef.current = null;
-    endTimeRef.current = null;
+    startTimeRef.current =
+      null;
+
+    endTimeRef.current =
+      null;
+
+    wpmSamplesRef.current =
+      [];
 
     setTimeout(() => {
       inputRef.current?.focus();
     }, 50);
   };
 
-  // ─── Tab key = restart shortcut ─────────────────────────────────────
+  // ─── Tab key = restart shortcut ───────────────────────────────────
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Tab") {
@@ -785,7 +1239,7 @@ export default function App() {
     };
   }, [handleRestart]);
 
-  // ─── Render ─────────────────────────────────────────────────────────
+  // ─── Render ────────────────────────────────────────────────────────
   return (
     <div
       className={`app ${
@@ -879,7 +1333,7 @@ export default function App() {
             "easy",
             "medium",
             "hard",
-            "code"
+            "code",
           ].map((d) => (
             <button
               key={d}
@@ -909,16 +1363,22 @@ export default function App() {
             <LiveStats
               wpm={wpm}
               accuracy={accuracy}
-              correctChars={correctChars}
+              correctChars={
+                correctChars
+              }
               totalTyped={totalTyped}
-              onRestart={handleRestart}
+              onRestart={
+                handleRestart
+              }
             />
 
             <TypingBox
               paragraph={paragraph}
               userInput={userInput}
               onInput={handleInput}
-              isFinished={isFinished}
+              isFinished={
+                isFinished
+              }
               inputRef={inputRef}
             />
 
@@ -942,9 +1402,15 @@ export default function App() {
             wpm={wpm}
             accuracy={accuracy}
             timeTaken={timeTaken}
-            source={paragraphData.source}
-            image={paragraphData.image}
-            onRestart={handleRestart}
+            source={
+              paragraphData.source
+            }
+            image={
+              paragraphData.image
+            }
+            onRestart={
+              handleRestart
+            }
           />
         )}
       </main>
@@ -957,7 +1423,9 @@ export default function App() {
         <div className="legal-links">
           <button
             onClick={() =>
-              setLegalType("privacy")
+              setLegalType(
+                "privacy"
+              )
             }
           >
             Privacy Policy
@@ -967,7 +1435,9 @@ export default function App() {
 
           <button
             onClick={() =>
-              setLegalType("terms")
+              setLegalType(
+                "terms"
+              )
             }
           >
             Terms of Use
