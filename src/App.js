@@ -346,129 +346,215 @@ function TypingBox({
 }) {
   const boxRef = useRef(null);
 
-  useEffect(() => {
-    if (!userInput.length) return;
+  /*
+   * Mobile browsers and in-app WebViews do not all handle the
+   * virtual keyboard the same way. Some resize visualViewport,
+   * some resize the layout viewport, and some simply overlay the
+   * keyboard on top of the page.
+   *
+   * This helper first centers the typing box and then, when a
+   * reduced visual viewport is available, makes sure its bottom
+   * edge stays above the keyboard with some breathing room.
+   */
+  const keepTypingBoxVisible = useCallback(() => {
+    const box = boxRef.current;
 
-    const scrollToTypingBox = () => {
-      const box = boxRef.current;
-      const viewport = window.visualViewport;
+    if (!box || !inputRef.current) return;
+    if (document.activeElement !== inputRef.current) return;
 
-      if (!box) return;
+    const isMobile =
+      /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      );
 
-      if (!viewport) {
-        box.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        return;
-      }
+    if (!isMobile) return;
 
-      const boxRect = box.getBoundingClientRect();
-
-      // Bottom edge of the currently visible viewport.
-      // When the keyboard is open, visualViewport.height
-      // represents the area above the keyboard.
-      const visibleBottom =
-        viewport.offsetTop + viewport.height;
-
-      const padding = 24;
-
-      // If the typing box is hidden below the keyboard,
-      // scroll it upward until it is visible.
-      if (boxRect.bottom > visibleBottom - padding) {
-        const amount =
-          boxRect.bottom -
-          (visibleBottom - padding);
-
-        window.scrollBy({
-          top: amount,
-          behavior: "smooth",
-        });
-      }
-
-      // Also make sure the top isn't pushed too far upward.
-      const visibleTop =
-        viewport.offsetTop + padding;
-
-      if (boxRect.top < visibleTop) {
-        const amount =
-          boxRect.top - visibleTop;
-
-        window.scrollBy({
-          top: amount,
-          behavior: "smooth",
-        });
-      }
-    };
-
-    // Give the mobile browser a moment to resize the
-    // visual viewport after the keyboard appears.
-    const timeout = setTimeout(
-      scrollToTypingBox,
-      100
-    );
-
-    return () => clearTimeout(timeout);
-  }, [userInput]);
-
-  useEffect(() => {
     const viewport = window.visualViewport;
+
+    /*
+     * First use the browser's native scrolling behavior.
+     * This is important inside WebViews where the keyboard may
+     * pan the page without resizing the viewport.
+     */
+    box.scrollIntoView({
+      behavior: "auto",
+      block: "center",
+      inline: "nearest",
+    });
 
     if (!viewport) return;
 
+    /*
+     * visualViewport.height is the part of the screen currently
+     * visible to the page. When the keyboard resizes the viewport,
+     * this becomes smaller than the normal window height.
+     */
+    const visibleTop =
+      viewport.offsetTop + 16;
+
+    const visibleBottom =
+      viewport.offsetTop +
+      viewport.height -
+      24;
+
+    const boxRect =
+      box.getBoundingClientRect();
+
+    /*
+     * If the box is still behind the keyboard, move the document
+     * upward by the exact amount required to reveal it.
+     */
+    if (boxRect.bottom > visibleBottom) {
+      window.scrollBy({
+        top:
+          boxRect.bottom -
+          visibleBottom,
+        behavior: "auto",
+      });
+      return;
+    }
+
+    /*
+     * Also recover if a WebView panned the page too far upward.
+     */
+    if (boxRect.top < visibleTop) {
+      window.scrollBy({
+        top:
+          boxRect.top -
+          visibleTop,
+        behavior: "auto",
+      });
+    }
+  }, [inputRef]);
+
+  /*
+   * The keyboard opens after the focus event in many mobile
+   * browsers/WebViews. Run the visibility check at several points
+   * during that transition instead of assuming one resize event
+   * will be delivered.
+   */
+  const handleInputFocus = useCallback(() => {
+    const delays = [0, 100, 300, 600];
+
+    const timers = delays.map((delay) =>
+      setTimeout(
+        keepTypingBoxVisible,
+        delay
+      )
+    );
+
+    return () => {
+      timers.forEach((timer) =>
+        clearTimeout(timer)
+      );
+    };
+  }, [keepTypingBoxVisible]);
+
+  /*
+   * Keep the typing box visible whenever the user types.
+   * requestAnimationFrame lets the browser finish layout before
+   * checking the position.
+   */
+  useEffect(() => {
+    if (!userInput.length) return;
+
+    const frame =
+      requestAnimationFrame(() => {
+        keepTypingBoxVisible();
+      });
+
+    return () =>
+      cancelAnimationFrame(frame);
+  }, [
+    userInput,
+    keepTypingBoxVisible,
+  ]);
+
+  /*
+   * Listen for viewport changes caused by the virtual keyboard.
+   *
+   * visualViewport is supported by modern mobile browsers and
+   * provides better information than window.innerHeight when
+   * the keyboard changes the visible portion of the screen.
+   */
+  useEffect(() => {
+    const isMobile =
+      /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      );
+
+    if (!isMobile) return;
+
+    const viewport =
+      window.visualViewport;
+
     const handleViewportChange = () => {
-      if (document.activeElement !== inputRef.current) {
+      if (
+        document.activeElement !==
+        inputRef.current
+      ) {
         return;
       }
 
-      const box = boxRef.current;
-
-      if (!box) return;
-
-      const boxRect =
-        box.getBoundingClientRect();
-
-      const visibleBottom =
-        viewport.offsetTop +
-        viewport.height;
-
-      const padding = 24;
-
-      if (
-        boxRect.bottom >
-        visibleBottom - padding
-      ) {
-        window.scrollBy({
-          top:
-            boxRect.bottom -
-            (visibleBottom - padding),
-          behavior: "auto",
-        });
-      }
+      /*
+       * The keyboard animation can take several frames.
+       * Delay slightly so WebViews that update their viewport
+       * asynchronously have time to settle.
+       */
+      requestAnimationFrame(() => {
+        keepTypingBoxVisible();
+      });
     };
 
-    viewport.addEventListener(
+    if (viewport) {
+      viewport.addEventListener(
+        "resize",
+        handleViewportChange
+      );
+
+      viewport.addEventListener(
+        "scroll",
+        handleViewportChange
+      );
+    }
+
+    window.addEventListener(
       "resize",
       handleViewportChange
     );
 
-    viewport.addEventListener(
+    window.addEventListener(
       "scroll",
       handleViewportChange
     );
 
     return () => {
-      viewport.removeEventListener(
+      if (viewport) {
+        viewport.removeEventListener(
+          "resize",
+          handleViewportChange
+        );
+
+        viewport.removeEventListener(
+          "scroll",
+          handleViewportChange
+        );
+      }
+
+      window.removeEventListener(
         "resize",
         handleViewportChange
       );
 
-      viewport.removeEventListener(
+      window.removeEventListener(
         "scroll",
         handleViewportChange
       );
     };
-  }, [inputRef]);
+  }, [
+    inputRef,
+    keepTypingBoxVisible,
+  ]);
 
   const renderText = () => {
     return paragraph.split("").map((char, i) => {
@@ -509,6 +595,7 @@ function TypingBox({
         onChange={(e) =>
           onInput(e.target.value)
         }
+        onFocus={handleInputFocus}
         disabled={isFinished}
         spellCheck={false}
         autoComplete="off"
@@ -635,20 +722,26 @@ function startMatrix(canvasId) {
 
   if (!canvas) return;
 
-  const context = canvas.getContext("2d");
+  const context =
+    canvas.getContext("2d");
 
-  canvas.width = canvas.offsetWidth;
-  canvas.height = window.innerHeight;
+  canvas.width =
+    canvas.offsetWidth;
+
+  canvas.height =
+    window.innerHeight;
 
   const katakana =
     "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
 
   const latin = "AVANTHIKA";
   const nums = "0123456789";
+
   const alphabet =
     katakana + latin + nums;
 
   const fontSize = 16;
+
   const columns =
     canvas.width / fontSize;
 
@@ -704,7 +797,10 @@ function startMatrix(canvasId) {
     }
   };
 
-  return setInterval(draw, 30);
+  return setInterval(
+    draw,
+    30
+  );
 }
 
 // ─── Main ───────────────────────────────────────────────────────────
@@ -712,18 +808,15 @@ export default function App() {
   const TOTAL_TIME = 60;
 
   /*
-   * WPM stabilization window.
+   * During the first few seconds, using the entire elapsed
+   * duration produces extreme values because the denominator
+   * starts extremely small.
    *
-   * During the first few seconds, calculating WPM from
-   * the entire elapsed time produces mathematically correct
-   * but visually useless spikes because the denominator is
-   * extremely small.
-   *
-   * We therefore blend the real elapsed-time WPM with a
-   * short rolling typing-speed measurement during the
-   * startup period.
+   * A 3-second rolling startup window keeps the live value
+   * meaningful while the final result still uses exact timing.
    */
-  const WPM_STABILIZATION_TIME = 3000;
+  const WPM_STABILIZATION_TIME =
+    3000;
 
   const [showLightbox, setShowLightbox] =
     useState(true);
@@ -739,26 +832,23 @@ export default function App() {
       getRandomParagraph("medium")
     );
 
-  const paragraph = paragraphData.text;
+  const paragraph =
+    paragraphData.text;
 
   const [userInput, setUserInput] =
     useState("");
 
   /*
-   * elapsedMs is the exact elapsed test time.
+   * Exact elapsed test time.
    *
-   * It is intentionally separate from timeLeft because
-   * timeLeft is only a user-facing whole-second countdown.
+   * This is separate from timeLeft because the visible
+   * countdown only needs whole-second precision.
    */
   const [elapsedMs, setElapsedMs] =
     useState(0);
 
   /*
-   * Tracks the WPM value shown on screen.
-   *
-   * Keeping this separate from elapsedMs allows the display
-   * to remain stable between timer updates and prevents
-   * React render timing from influencing the calculation.
+   * WPM value currently displayed in the live statistics.
    */
   const [displayWpm, setDisplayWpm] =
     useState(0);
@@ -770,34 +860,40 @@ export default function App() {
     useState(false);
 
   // Exact timestamp of the first keystroke.
-  const startTimeRef = useRef(null);
+  const startTimeRef =
+    useRef(null);
 
   // Exact timestamp when the test finishes.
-  const endTimeRef = useRef(null);
+  const endTimeRef =
+    useRef(null);
 
   /*
-   * Stores recent typing samples.
+   * Recent typing samples used by the startup rolling WPM
+   * calculation.
    *
-   * Each sample contains:
-   * - timestamp
+   * Each sample stores:
+   * - time
    * - correct character count
-   *
-   * These samples allow the live WPM to be calculated from
-   * the user's recent typing pace instead of dividing by an
-   * extremely small total elapsed time.
    */
-  const wpmSamplesRef = useRef([]);
+  const wpmSamplesRef =
+    useRef([]);
 
-  const inputRef = useRef(null);
-  const timerRef = useRef(null);
-  const wpmUpdateRef = useRef(null);
+  const inputRef =
+    useRef(null);
+
+  const timerRef =
+    useRef(null);
+
+  const wpmUpdateRef =
+    useRef(null);
 
   // ─── Matrix result effect ─────────────────────────────────────────
   useEffect(() => {
     let rain;
 
     if (isFinished) {
-      rain = startMatrix("matrix-bg");
+      rain =
+        startMatrix("matrix-bg");
     }
 
     return () => {
@@ -806,152 +902,157 @@ export default function App() {
   }, [isFinished]);
 
   // ─── Character statistics ─────────────────────────────────────────
-  const correctChars = userInput
-    .split("")
-    .filter(
-      (ch, i) => ch === paragraph[i]
-    ).length;
+  const correctChars =
+    userInput
+      .split("")
+      .filter(
+        (ch, i) =>
+          ch === paragraph[i]
+      ).length;
 
-  const totalTyped = userInput.length;
+  const totalTyped =
+    userInput.length;
 
   // ─── Accuracy calculation ─────────────────────────────────────────
   const accuracy =
     totalTyped > 0
       ? Math.round(
-          (correctChars / totalTyped) *
+          (correctChars /
+            totalTyped) *
             100
         )
       : 100;
 
   // ─── Live WPM calculation ─────────────────────────────────────────
-  /*
-   * Calculate WPM using a recent rolling window.
-   *
-   * The rolling window prevents the first few keystrokes
-   * from dominating the displayed speed.
-   *
-   * Once enough time has elapsed, WPM transitions to the
-   * normal full-test calculation.
-   */
-  const calculateLiveWpm = useCallback(
-    (correctCount, elapsed) => {
-      if (
-        !startTimeRef.current ||
-        elapsed <= 0 ||
-        correctCount <= 0
-      ) {
-        return 0;
-      }
-
-      const elapsedSeconds =
-        elapsed / 1000;
-
-      /*
-       * For the first 3 seconds, use a rolling window
-       * whose minimum duration is 1 second.
-       *
-       * This prevents values such as:
-       *
-       * 10 chars / 0.1 seconds = 1200 WPM
-       *
-       * while still responding quickly to actual typing.
-       */
-      if (
-        elapsedSeconds <
-        WPM_STABILIZATION_TIME / 1000
-      ) {
-        const now =
-          performance.now();
-
-        const samples =
-          wpmSamplesRef.current;
-
-        /*
-         * Keep only samples from the most recent
-         * stabilization window.
-         */
-        const windowStart =
-          now -
-          WPM_STABILIZATION_TIME;
-
-        while (
-          samples.length > 0 &&
-          samples[0].time < windowStart
+  const calculateLiveWpm =
+    useCallback(
+      (
+        correctCount,
+        elapsed
+      ) => {
+        if (
+          !startTimeRef.current ||
+          elapsed <= 0 ||
+          correctCount <= 0
         ) {
-          samples.shift();
-        }
-
-        /*
-         * We need a meaningful time interval before
-         * calculating rolling WPM.
-         */
-        if (samples.length < 2) {
           return 0;
         }
 
-        const first =
-          samples[0];
-
-        const last =
-          samples[samples.length - 1];
-
-        const windowMs =
-          last.time - first.time;
+        const elapsedSeconds =
+          elapsed / 1000;
 
         /*
-         * Never calculate a speed over an interval
-         * smaller than 1 second.
+         * First 3 seconds:
+         *
+         * Use recent typing samples rather than dividing
+         * directly by the tiny total elapsed time.
          */
-        const effectiveWindowMs =
-          Math.max(windowMs, 1000);
+        if (
+          elapsedSeconds <
+          WPM_STABILIZATION_TIME /
+            1000
+        ) {
+          const now =
+            performance.now();
 
-        const charsTyped =
-          Math.max(
-            0,
-            last.correctChars -
-              first.correctChars
+          const samples =
+            wpmSamplesRef.current;
+
+          const windowStart =
+            now -
+            WPM_STABILIZATION_TIME;
+
+          /*
+           * Remove samples outside the rolling window.
+           */
+          while (
+            samples.length > 0 &&
+            samples[0].time <
+              windowStart
+          ) {
+            samples.shift();
+          }
+
+          /*
+           * We need at least two samples to establish
+           * a meaningful typing interval.
+           */
+          if (
+            samples.length <
+            2
+          ) {
+            return 0;
+          }
+
+          const first =
+            samples[0];
+
+          const last =
+            samples[
+              samples.length - 1
+            ];
+
+          const windowMs =
+            last.time -
+            first.time;
+
+          /*
+           * Never calculate a rate using less than
+           * one second of elapsed time.
+           */
+          const effectiveWindowMs =
+            Math.max(
+              windowMs,
+              1000
+            );
+
+          const charsTyped =
+            Math.max(
+              0,
+              last.correctChars -
+                first.correctChars
+            );
+
+          /*
+           * During the first second, use the total number
+           * of characters typed but still divide by at least
+           * one second.
+           */
+          const effectiveChars =
+            windowMs < 1000
+              ? last.correctChars
+              : charsTyped;
+
+          const minutes =
+            effectiveWindowMs /
+            60000;
+
+          return Math.round(
+            (effectiveChars / 5) /
+              minutes
           );
+        }
 
         /*
-         * If the sample interval is shorter than one
-         * second, include the current cumulative progress
-         * while using the minimum one-second denominator.
+         * After stabilization, use standard full-test
+         * NET WPM.
          */
-        const effectiveChars =
-          windowMs < 1000
-            ? last.correctChars
-            : charsTyped;
-
-        const minutes =
-          effectiveWindowMs / 60000;
+        const elapsedMinutes =
+          elapsed / 60000;
 
         return Math.round(
-          (effectiveChars / 5) /
-            minutes
+          (correctCount / 5) /
+            elapsedMinutes
         );
-      }
+      },
+      []
+    );
 
-      /*
-       * After the startup period, use the standard
-       * full-test NET WPM calculation.
-       */
-      const elapsedMinutes =
-        elapsed / 60000;
-
-      return Math.round(
-        (correctCount / 5) /
-          elapsedMinutes
-      );
-    },
-    []
-  );
-
-  // ─── Display WPM ──────────────────────────────────────────────────
+  // ─── Final WPM calculation ────────────────────────────────────────
   /*
-   * The actual WPM used by the result screen is always the
-   * exact full-test calculation.
-   *
-   * displayWpm is only the live value shown while typing.
+   * This value is always calculated using the exact full-test
+   * elapsed time and is therefore independent of the live
+   * stabilization logic.
    */
   const finalWpm =
     elapsedMs > 0
@@ -961,32 +1062,52 @@ export default function App() {
         )
       : 0;
 
-  const wpm = isFinished
-    ? finalWpm
-    : displayWpm;
+  /*
+   * While typing, display the stabilized live WPM.
+   * On the result screen, display the exact final WPM.
+   */
+  const wpm =
+    isFinished
+      ? finalWpm
+      : displayWpm;
 
   // ─── Display time ─────────────────────────────────────────────────
-  const timeTaken = Math.min(
-    TOTAL_TIME,
-    Math.round(elapsedMs / 1000)
-  );
+  const timeTaken =
+    Math.min(
+      TOTAL_TIME,
+      Math.round(
+        elapsedMs / 1000
+      )
+    );
 
-  const timeLeft = Math.max(
-    0,
-    TOTAL_TIME -
-      Math.floor(elapsedMs / 1000)
-  );
+  const timeLeft =
+    Math.max(
+      0,
+      TOTAL_TIME -
+        Math.floor(
+          elapsedMs / 1000
+        )
+    );
 
   // ─── High-precision timer ─────────────────────────────────────────
   useEffect(() => {
     if (!isRunning) {
-      clearInterval(timerRef.current);
-      clearInterval(wpmUpdateRef.current);
+      clearInterval(
+        timerRef.current
+      );
+
+      clearInterval(
+        wpmUpdateRef.current
+      );
+
       return;
     }
 
     const updateElapsed = () => {
-      if (startTimeRef.current === null) {
+      if (
+        startTimeRef.current ===
+        null
+      ) {
         return;
       }
 
@@ -1009,12 +1130,11 @@ export default function App() {
         );
 
         /*
-         * At the end of the test, always use the
-         * exact final WPM instead of the stabilized
-         * live value.
+         * At timeout, always use exact final WPM.
          */
         const finalElapsedMinutes =
-          exactElapsed / 60000;
+          exactElapsed /
+          60000;
 
         const finalCorrectChars =
           userInput
@@ -1025,9 +1145,11 @@ export default function App() {
             ).length;
 
         const finalWpm =
-          finalElapsedMinutes > 0
+          finalElapsedMinutes >
+          0
             ? Math.round(
-                (finalCorrectChars / 5) /
+                (finalCorrectChars /
+                  5) /
                   finalElapsedMinutes
               )
             : 0;
@@ -1047,13 +1169,20 @@ export default function App() {
           wpmUpdateRef.current
         );
 
-        setIsFinished(true);
-        setIsRunning(false);
+        setIsFinished(
+          true
+        );
+
+        setIsRunning(
+          false
+        );
 
         return;
       }
 
-      setElapsedMs(elapsed);
+      setElapsedMs(
+        elapsed
+      );
 
       const currentCorrectChars =
         userInput
@@ -1113,8 +1242,7 @@ export default function App() {
         if (isFinished) return;
 
         /*
-         * Start timing exactly when the first character
-         * is entered.
+         * Start timing exactly on the first actual input.
          */
         if (
           !isRunning &&
@@ -1129,6 +1257,10 @@ export default function App() {
           endTimeRef.current =
             null;
 
+          /*
+           * Seed the rolling sample list with
+           * the initial state.
+           */
           wpmSamplesRef.current =
             [
               {
@@ -1143,8 +1275,7 @@ export default function App() {
         }
 
         /*
-         * Calculate the number of correct characters
-         * for the new input value.
+         * Calculate correct characters for the new input.
          */
         const newCorrectChars =
           val
@@ -1155,10 +1286,7 @@ export default function App() {
             ).length;
 
         /*
-         * Record a sample immediately on every input.
-         *
-         * These samples are used only for the live
-         * stabilized WPM calculation.
+         * Add the current typing sample.
          */
         if (
           startTimeRef.current !==
@@ -1178,8 +1306,8 @@ export default function App() {
         setUserInput(val);
 
         /*
-         * Finish immediately when the complete
-         * passage has been typed.
+         * Finish immediately when the passage
+         * is completely typed.
          */
         if (
           val.length >=
@@ -1204,18 +1332,18 @@ export default function App() {
             );
 
             /*
-             * The final result is never based on
-             * the rolling WPM. It uses the exact
-             * elapsed duration of the entire test.
+             * Final WPM always uses exact elapsed time.
              */
             const elapsedMinutes =
               exactElapsed /
               60000;
 
             const exactFinalWpm =
-              elapsedMinutes > 0
+              elapsedMinutes >
+              0
                 ? Math.round(
-                    (newCorrectChars / 5) /
+                    (newCorrectChars /
+                      5) /
                       elapsedMinutes
                   )
                 : 0;
@@ -1236,8 +1364,13 @@ export default function App() {
             wpmUpdateRef.current
           );
 
-          setIsFinished(true);
-          setIsRunning(false);
+          setIsFinished(
+            true
+          );
+
+          setIsRunning(
+            false
+          );
         }
       },
       [
@@ -1249,7 +1382,55 @@ export default function App() {
 
   // ─── Reset everything ──────────────────────────────────────────────
   const handleRestart =
-    useCallback(() => {
+    useCallback(
+      () => {
+        clearInterval(
+          timerRef.current
+        );
+
+        clearInterval(
+          wpmUpdateRef.current
+        );
+
+        const newParagraph =
+          getRandomParagraph(
+            difficulty
+          );
+
+        setParagraphData(
+          newParagraph
+        );
+
+        setUserInput("");
+
+        setElapsedMs(0);
+
+        setDisplayWpm(0);
+
+        setIsRunning(false);
+        setIsFinished(false);
+
+        startTimeRef.current =
+          null;
+
+        endTimeRef.current =
+          null;
+
+        wpmSamplesRef.current =
+          [];
+
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 50);
+      },
+      [difficulty]
+    );
+
+  // ─── Change difficulty and reset ───────────────────────────────────
+  const handleDifficulty =
+    (d) => {
+      setDifficulty(d);
+
       clearInterval(
         timerRef.current
       );
@@ -1259,9 +1440,7 @@ export default function App() {
       );
 
       const newParagraph =
-        getRandomParagraph(
-          difficulty
-        );
+        getRandomParagraph(d);
 
       setParagraphData(
         newParagraph
@@ -1288,49 +1467,7 @@ export default function App() {
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
-    }, [difficulty]);
-
-  // ─── Change difficulty and reset ───────────────────────────────────
-  const handleDifficulty = (d) => {
-    setDifficulty(d);
-
-    clearInterval(
-      timerRef.current
-    );
-
-    clearInterval(
-      wpmUpdateRef.current
-    );
-
-    const newParagraph =
-      getRandomParagraph(d);
-
-    setParagraphData(
-      newParagraph
-    );
-
-    setUserInput("");
-
-    setElapsedMs(0);
-
-    setDisplayWpm(0);
-
-    setIsRunning(false);
-    setIsFinished(false);
-
-    startTimeRef.current =
-      null;
-
-    endTimeRef.current =
-      null;
-
-    wpmSamplesRef.current =
-      [];
-
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
-  };
+    };
 
   // ─── Tab key = restart shortcut ───────────────────────────────────
   useEffect(() => {
@@ -1472,29 +1609,43 @@ export default function App() {
           <>
             <Timer
               timeLeft={timeLeft}
-              totalTime={TOTAL_TIME}
+              totalTime={
+                TOTAL_TIME
+              }
             />
 
             <LiveStats
               wpm={wpm}
-              accuracy={accuracy}
+              accuracy={
+                accuracy
+              }
               correctChars={
                 correctChars
               }
-              totalTyped={totalTyped}
+              totalTyped={
+                totalTyped
+              }
               onRestart={
                 handleRestart
               }
             />
 
             <TypingBox
-              paragraph={paragraph}
-              userInput={userInput}
-              onInput={handleInput}
+              paragraph={
+                paragraph
+              }
+              userInput={
+                userInput
+              }
+              onInput={
+                handleInput
+              }
               isFinished={
                 isFinished
               }
-              inputRef={inputRef}
+              inputRef={
+                inputRef
+              }
             />
 
             <p className="shortcut-hint">
@@ -1515,8 +1666,12 @@ export default function App() {
         ) : (
           <Result
             wpm={wpm}
-            accuracy={accuracy}
-            timeTaken={timeTaken}
+            accuracy={
+              accuracy
+            }
+            timeTaken={
+              timeTaken
+            }
             source={
               paragraphData.source
             }

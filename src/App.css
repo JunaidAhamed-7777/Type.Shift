@@ -1028,24 +1028,79 @@ html {
 }
 
 @media (max-width: 600px) {
+  /*
+   * Keep the document scrollable on mobile.
+   *
+   * Some in-app browsers overlay the keyboard instead of
+   * resizing the page. A scrollable document gives our JS
+   * enough room to move the typing box above that overlay.
+   */
+  html {
+    scroll-padding-bottom: 45vh;
+    overflow-y: auto;
+  }
+
+  body,
+  #root {
+    min-height: 100%;
+    height: auto;
+  }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .app {
-    padding: 1.2rem 0.8rem 1rem;
+    padding: 1.2rem 0.8rem 45vh;
+    min-height: 100dvh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   .app.game-active {
     height: auto;
     min-height: 100dvh;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: visible;
+  }
+
+  .app.game-active .test-area {
+    flex: none;
+    min-height: auto;
   }
 
   .typing-box {
     padding: 1.2rem;
+    scroll-margin-top: 16px;
+    scroll-margin-bottom: 45vh;
   }
 
   .hidden-input {
     padding: 1.2rem;
   }
 
-  /* rest of your existing mobile CSS */
+  .result-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .result-card {
+    width: 100%;
+    max-width: 220px;
+  }
+
+  .live-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-pill {
+    min-width: 60px;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .timer-wrapper {
+    gap: 0.8rem;
+  }
 }
