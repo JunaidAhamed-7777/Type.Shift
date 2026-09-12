@@ -347,13 +347,128 @@ function TypingBox({
   const boxRef = useRef(null);
 
   useEffect(() => {
-    if (userInput.length > 0) {
-      boxRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
+    if (!userInput.length) return;
+
+    const scrollToTypingBox = () => {
+      const box = boxRef.current;
+      const viewport = window.visualViewport;
+
+      if (!box) return;
+
+      if (!viewport) {
+        box.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return;
+      }
+
+      const boxRect = box.getBoundingClientRect();
+
+      // Bottom edge of the currently visible viewport.
+      // When the keyboard is open, visualViewport.height
+      // represents the area above the keyboard.
+      const visibleBottom =
+        viewport.offsetTop + viewport.height;
+
+      const padding = 24;
+
+      // If the typing box is hidden below the keyboard,
+      // scroll it upward until it is visible.
+      if (boxRect.bottom > visibleBottom - padding) {
+        const amount =
+          boxRect.bottom -
+          (visibleBottom - padding);
+
+        window.scrollBy({
+          top: amount,
+          behavior: "smooth",
+        });
+      }
+
+      // Also make sure the top isn't pushed too far upward.
+      const visibleTop =
+        viewport.offsetTop + padding;
+
+      if (boxRect.top < visibleTop) {
+        const amount =
+          boxRect.top - visibleTop;
+
+        window.scrollBy({
+          top: amount,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    // Give the mobile browser a moment to resize the
+    // visual viewport after the keyboard appears.
+    const timeout = setTimeout(
+      scrollToTypingBox,
+      100
+    );
+
+    return () => clearTimeout(timeout);
   }, [userInput]);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+
+    if (!viewport) return;
+
+    const handleViewportChange = () => {
+      if (document.activeElement !== inputRef.current) {
+        return;
+      }
+
+      const box = boxRef.current;
+
+      if (!box) return;
+
+      const boxRect =
+        box.getBoundingClientRect();
+
+      const visibleBottom =
+        viewport.offsetTop +
+        viewport.height;
+
+      const padding = 24;
+
+      if (
+        boxRect.bottom >
+        visibleBottom - padding
+      ) {
+        window.scrollBy({
+          top:
+            boxRect.bottom -
+            (visibleBottom - padding),
+          behavior: "auto",
+        });
+      }
+    };
+
+    viewport.addEventListener(
+      "resize",
+      handleViewportChange
+    );
+
+    viewport.addEventListener(
+      "scroll",
+      handleViewportChange
+    );
+
+    return () => {
+      viewport.removeEventListener(
+        "resize",
+        handleViewportChange
+      );
+
+      viewport.removeEventListener(
+        "scroll",
+        handleViewportChange
+      );
+    };
+  }, [inputRef]);
 
   const renderText = () => {
     return paragraph.split("").map((char, i) => {

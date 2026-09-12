@@ -62,7 +62,6 @@ body {
 .app.game-active {
   height: 100dvh;
   min-height: 100dvh;
-  overflow: hidden;
 }
 
 .app.game-active .test-area {
