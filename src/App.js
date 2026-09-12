@@ -1570,8 +1570,8 @@ export default function App() {
         </div>
 
         <p className="tagline">
-          There are no two words in the English
-          language more harmful than "good job"
+          There Is Something Wrong With You,
+          And I Love It.
         </p>
       </header>
 
