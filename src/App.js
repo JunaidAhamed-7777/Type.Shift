@@ -348,13 +348,16 @@ function TypingBox({
 
   /*
    * Mobile browsers and in-app WebViews do not all handle the
-   * virtual keyboard the same way. Some resize visualViewport,
-   * some resize the layout viewport, and some simply overlay the
-   * keyboard on top of the page.
+   * virtual keyboard the same way.
    *
-   * This helper first centers the typing box and then, when a
-   * reduced visual viewport is available, makes sure its bottom
-   * edge stays above the keyboard with some breathing room.
+   * The important distinction here is:
+   *
+   * 1. When the keyboard opens, move the typing box into view.
+   * 2. After that, DO NOT keep forcing the page position while
+   *    the user manually scrolls.
+   *
+   * This prevents the input from becoming effectively "locked"
+   * to one position on the screen.
    */
   const keepTypingBoxVisible = useCallback(() => {
     const box = boxRef.current;
@@ -372,9 +375,10 @@ function TypingBox({
     const viewport = window.visualViewport;
 
     /*
-     * First use the browser's native scrolling behavior.
-     * This is important inside WebViews where the keyboard may
-     * pan the page without resizing the viewport.
+     * First allow the browser to perform its native
+     * keyboard-avoidance behavior.
+     *
+     * This is especially useful inside WebViews.
      */
     box.scrollIntoView({
       behavior: "auto",
@@ -384,11 +388,6 @@ function TypingBox({
 
     if (!viewport) return;
 
-    /*
-     * visualViewport.height is the part of the screen currently
-     * visible to the page. When the keyboard resizes the viewport,
-     * this becomes smaller than the normal window height.
-     */
     const visibleTop =
       viewport.offsetTop + 16;
 
@@ -401,8 +400,8 @@ function TypingBox({
       box.getBoundingClientRect();
 
     /*
-     * If the box is still behind the keyboard, move the document
-     * upward by the exact amount required to reveal it.
+     * Only correct the position when the box is actually
+     * hidden behind the keyboard.
      */
     if (boxRect.bottom > visibleBottom) {
       window.scrollBy({
@@ -411,11 +410,13 @@ function TypingBox({
           visibleBottom,
         behavior: "auto",
       });
+
       return;
     }
 
     /*
-     * Also recover if a WebView panned the page too far upward.
+     * Recover if a WebView initially pans the page too far
+     * upward during keyboard opening.
      */
     if (boxRect.top < visibleTop) {
       window.scrollBy({
@@ -428,10 +429,14 @@ function TypingBox({
   }, [inputRef]);
 
   /*
-   * The keyboard opens after the focus event in many mobile
-   * browsers/WebViews. Run the visibility check at several points
-   * during that transition instead of assuming one resize event
-   * will be delivered.
+   * The keyboard often appears slightly after the focus event.
+   * Run the initial positioning several times so that Chromium
+   * and embedded WebViews have time to finish their keyboard
+   * transition.
+   *
+   * IMPORTANT:
+   * These checks happen only around focus.
+   * They do NOT run continuously while the user scrolls.
    */
   const handleInputFocus = useCallback(() => {
     const delays = [0, 100, 300, 600];
@@ -451,9 +456,10 @@ function TypingBox({
   }, [keepTypingBoxVisible]);
 
   /*
-   * Keep the typing box visible whenever the user types.
-   * requestAnimationFrame lets the browser finish layout before
-   * checking the position.
+   * Keep the typing box visible after text changes, but only
+   * while the keyboard is likely settling into position.
+   *
+   * This is intentionally NOT coupled to scroll events.
    */
   useEffect(() => {
     if (!userInput.length) return;
@@ -471,11 +477,15 @@ function TypingBox({
   ]);
 
   /*
-   * Listen for viewport changes caused by the virtual keyboard.
+   * Listen for viewport resizing caused by the virtual keyboard.
    *
-   * visualViewport is supported by modern mobile browsers and
-   * provides better information than window.innerHeight when
-   * the keyboard changes the visible portion of the screen.
+   * We intentionally do NOT listen for:
+   * - visualViewport "scroll"
+   * - window "scroll"
+   *
+   * Those events can also be triggered by the user manually
+   * scrolling the page. Listening to them would immediately
+   * undo the user's scroll position.
    */
   useEffect(() => {
     const isMobile =
@@ -488,7 +498,9 @@ function TypingBox({
     const viewport =
       window.visualViewport;
 
-    const handleViewportChange = () => {
+    let settleTimer = null;
+
+    const handleViewportResize = () => {
       if (
         document.activeElement !==
         inputRef.current
@@ -497,58 +509,47 @@ function TypingBox({
       }
 
       /*
-       * The keyboard animation can take several frames.
-       * Delay slightly so WebViews that update their viewport
-       * asynchronously have time to settle.
+       * Give the WebView a moment to finish updating its
+       * visual viewport before correcting the typing box.
        */
-      requestAnimationFrame(() => {
-        keepTypingBoxVisible();
-      });
+      if (settleTimer) {
+        clearTimeout(settleTimer);
+      }
+
+      settleTimer = setTimeout(() => {
+        requestAnimationFrame(() => {
+          keepTypingBoxVisible();
+        });
+      }, 50);
     };
 
     if (viewport) {
       viewport.addEventListener(
         "resize",
-        handleViewportChange
-      );
-
-      viewport.addEventListener(
-        "scroll",
-        handleViewportChange
+        handleViewportResize
       );
     }
 
     window.addEventListener(
       "resize",
-      handleViewportChange
-    );
-
-    window.addEventListener(
-      "scroll",
-      handleViewportChange
+      handleViewportResize
     );
 
     return () => {
+      if (settleTimer) {
+        clearTimeout(settleTimer);
+      }
+
       if (viewport) {
         viewport.removeEventListener(
           "resize",
-          handleViewportChange
-        );
-
-        viewport.removeEventListener(
-          "scroll",
-          handleViewportChange
+          handleViewportResize
         );
       }
 
       window.removeEventListener(
         "resize",
-        handleViewportChange
-      );
-
-      window.removeEventListener(
-        "scroll",
-        handleViewportChange
+        handleViewportResize
       );
     };
   }, [
@@ -714,7 +715,8 @@ function Result({
 // ─── Matrix Rain Effect ─────────────────────────────────────────────
 /*
 MATRIX RAIN EFFECT
-CREDITS ALL BELONG TO https://github.com/javascriptacademy-stash/digital-rain
+CREDITS ALL BELONG TO:
+https://github.com/javascriptacademy-stash/digital-rain
 */
 function startMatrix(canvasId) {
   const canvas =
@@ -943,7 +945,6 @@ export default function App() {
 
         /*
          * First 3 seconds:
-         *
          * Use recent typing samples rather than dividing
          * directly by the tiny total elapsed time.
          */
