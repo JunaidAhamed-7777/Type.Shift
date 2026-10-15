@@ -714,9 +714,9 @@ function Result({
         {image && (
           <img
             src={image}
-            alt="Passage book cover"
-            width="42"
-            height="60"
+            alt={`${source.split("·")[0].trim()} book cover`}
+            width="128"
+            height="192"
             onError={(event) => {
               event.currentTarget.style.display = "none";
             }}
@@ -749,10 +749,6 @@ function startMatrix(canvasId) {
 
   if (!context) return;
 
-  canvas.width = canvas.offsetWidth;
-
-  canvas.height = window.innerHeight;
-
   const katakana =
     "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
 
@@ -763,15 +759,27 @@ function startMatrix(canvasId) {
 
   const fontSize = 16;
 
-  const columns = canvas.width / fontSize;
-
-  const rainDrops = Array(Math.floor(columns)).fill(1);
+  let width = 0;
+  let height = 0;
+  let rainDrops = [];
+  const resize = () => {
+    const bounds = canvas.getBoundingClientRect();
+    width = bounds.width || window.innerWidth;
+    height = bounds.height || window.innerHeight;
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * pixelRatio);
+    canvas.height = Math.round(height * pixelRatio);
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    rainDrops = Array.from({ length: Math.ceil(width / fontSize) }, () => Math.random() * height / fontSize);
+  };
 
   const draw = () => {
     if (document.hidden) return;
+    // Erase to transparency so trails work on light and dark page backgrounds.
+    context.globalCompositeOperation = "destination-out";
     context.fillStyle = "rgba(0, 0, 0, 0.05)";
-
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(0, 0, width, height);
+    context.globalCompositeOperation = "source-over";
 
     context.fillStyle = getComputedStyle(canvas)
       .getPropertyValue("--accent")
@@ -784,7 +792,7 @@ function startMatrix(canvasId) {
 
       context.fillText(text, i * fontSize, rainDrops[i] * fontSize);
 
-      if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      if (rainDrops[i] * fontSize > height && Math.random() > 0.975) {
         rainDrops[i] = 0;
       }
 
@@ -792,7 +800,23 @@ function startMatrix(canvasId) {
     }
   };
 
-  return setInterval(draw, 30);
+  let interval;
+  const updateVisibility = () => {
+    clearInterval(interval);
+    if (!document.hidden) {
+      draw();
+      interval = setInterval(draw, 30);
+    }
+  };
+  resize();
+  updateVisibility();
+  window.addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", updateVisibility);
+  return () => {
+    clearInterval(interval);
+    window.removeEventListener("resize", resize);
+    document.removeEventListener("visibilitychange", updateVisibility);
+  };
 }
 
 // ─── Main ───────────────────────────────────────────────────────────
@@ -882,7 +906,8 @@ export default function App() {
       "(prefers-reduced-motion: reduce)",
     );
     const updateMotion = () => {
-      clearInterval(rain);
+      rain?.();
+      rain = undefined;
       if (isFinished && !motionPreference.matches) {
         rain = startMatrix("matrix-bg");
       }
@@ -891,7 +916,7 @@ export default function App() {
     motionPreference.addEventListener("change", updateMotion);
 
     return () => {
-      clearInterval(rain);
+      rain?.();
       motionPreference.removeEventListener("change", updateMotion);
     };
   }, [isFinished]);
