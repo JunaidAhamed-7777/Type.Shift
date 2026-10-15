@@ -807,7 +807,7 @@ function startMatrix(canvasId) {
 
 // ─── Main ───────────────────────────────────────────────────────────
 export default function App() {
-  const TOTAL_TIME = 60;
+  const [totalTime, setTotalTime] = useState(60);
 
   /*
    * During the first few seconds, using the entire elapsed
@@ -821,7 +821,7 @@ export default function App() {
     3000;
 
   const [showLightbox, setShowLightbox] =
-    useState(true);
+    useState(false);
 
   const [legalType, setLegalType] =
     useState(null);
@@ -888,6 +888,18 @@ export default function App() {
 
   const wpmUpdateRef =
     useRef(null);
+
+  const restartFocusRef = useRef(null);
+  const modalOpenRef = useRef(false);
+  modalOpenRef.current = showLightbox || Boolean(legalType);
+
+  useEffect(() => {
+    if (showLightbox || legalType) {
+      cancelAnimationFrame(restartFocusRef.current);
+    }
+
+    return () => cancelAnimationFrame(restartFocusRef.current);
+  }, [showLightbox, legalType]);
 
   // ─── Matrix result effect ─────────────────────────────────────────
   useEffect(() => {
@@ -1038,6 +1050,8 @@ export default function App() {
          * After stabilization, use standard full-test
          * NET WPM.
          */
+        wpmSamplesRef.current = [];
+
         const elapsedMinutes =
           elapsed / 60000;
 
@@ -1075,7 +1089,7 @@ export default function App() {
   // ─── Display time ─────────────────────────────────────────────────
   const timeTaken =
     Math.min(
-      TOTAL_TIME,
+      totalTime,
       Math.round(
         elapsedMs / 1000
       )
@@ -1084,7 +1098,7 @@ export default function App() {
   const timeLeft =
     Math.max(
       0,
-      TOTAL_TIME -
+      totalTime -
         Math.floor(
           elapsedMs / 1000
         )
@@ -1121,10 +1135,10 @@ export default function App() {
 
       if (
         elapsed >=
-        TOTAL_TIME * 1000
+        totalTime * 1000
       ) {
         const exactElapsed =
-          TOTAL_TIME * 1000;
+          totalTime * 1000;
 
         setElapsedMs(
           exactElapsed
@@ -1229,29 +1243,45 @@ export default function App() {
     calculateLiveWpm,
     paragraph,
     userInput,
+    totalTime,
   ]);
 
   // ─── Auto-focus hidden textarea ───────────────────────────────────
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  // Focus is requested by the user, never on mount or behind a dialog.
 
   // ─── Handle typing input ───────────────────────────────────────────
   const handleInput =
     useCallback(
       (val) => {
-        if (isFinished) return;
+        if (isFinished || modalOpenRef.current) return;
+
+        const now = performance.now();
+
+        // An input event can arrive before a throttled interval catches up.
+        if (
+          startTimeRef.current !== null &&
+          now - startTimeRef.current >= totalTime * 1000
+        ) {
+          setElapsedMs(totalTime * 1000);
+          endTimeRef.current = startTimeRef.current + totalTime * 1000;
+          clearInterval(timerRef.current);
+          clearInterval(wpmUpdateRef.current);
+          setIsFinished(true);
+          setIsRunning(false);
+          return;
+        }
+
+        val = val.slice(0, paragraph.length);
+
+        if (val === userInput) return;
 
         /*
          * Start timing exactly on the first actual input.
          */
         if (
-          !isRunning &&
+          startTimeRef.current === null &&
           val.length > 0
         ) {
-          const now =
-            performance.now();
-
           startTimeRef.current =
             now;
 
@@ -1292,7 +1322,8 @@ export default function App() {
         if (
           startTimeRef.current !==
             null &&
-          val.length > 0
+          val.length > 0 &&
+          now - startTimeRef.current < WPM_STABILIZATION_TIME
         ) {
           wpmSamplesRef.current.push(
             {
@@ -1302,6 +1333,11 @@ export default function App() {
                 newCorrectChars,
             }
           );
+        } else if (
+          startTimeRef.current !== null &&
+          now - startTimeRef.current >= WPM_STABILIZATION_TIME
+        ) {
+          wpmSamplesRef.current = [];
         }
 
         setUserInput(val);
@@ -1314,16 +1350,13 @@ export default function App() {
           val.length >=
           paragraph.length
         ) {
-          const now =
-            performance.now();
-
           if (
             startTimeRef.current !==
             null
           ) {
             const exactElapsed =
               Math.min(
-                TOTAL_TIME * 1000,
+                totalTime * 1000,
                 now -
                   startTimeRef.current
               );
@@ -1375,16 +1408,18 @@ export default function App() {
         }
       },
       [
-        isRunning,
         isFinished,
         paragraph,
+        totalTime,
+        userInput,
       ]
     );
 
   // ─── Reset everything ──────────────────────────────────────────────
   const handleRestart =
     useCallback(
-      () => {
+      (options = {}) => {
+        cancelAnimationFrame(restartFocusRef.current);
         clearInterval(
           timerRef.current
         );
@@ -1420,9 +1455,11 @@ export default function App() {
         wpmSamplesRef.current =
           [];
 
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 50);
+        if (options.focus !== false) {
+          restartFocusRef.current = requestAnimationFrame(() => {
+            if (!modalOpenRef.current) inputRef.current?.focus();
+          });
+        }
       },
       [difficulty]
     );
@@ -1430,6 +1467,8 @@ export default function App() {
   // ─── Change difficulty and reset ───────────────────────────────────
   const handleDifficulty =
     (d) => {
+      if (!Object.prototype.hasOwnProperty.call(PARAGRAPHS, d)) return;
+      cancelAnimationFrame(restartFocusRef.current);
       setDifficulty(d);
 
       clearInterval(
@@ -1464,16 +1503,30 @@ export default function App() {
 
       wpmSamplesRef.current =
         [];
-
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
     };
+
+  const handleDuration = (seconds) => {
+    if (![15, 30, 60, 120].includes(seconds) || seconds === totalTime) return;
+    setTotalTime(seconds);
+    handleRestart({ focus: false });
+  };
 
   // ─── Tab key = restart shortcut ───────────────────────────────────
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Tab") {
+      if (modalOpenRef.current || e.isComposing) return;
+
+      if (e.key === "Escape" && e.target === inputRef.current) {
+        inputRef.current.blur();
+        return;
+      }
+
+      if (
+        e.key === "Tab" &&
+        e.target === inputRef.current &&
+        userInput.length > 0 &&
+        !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey
+      ) {
         e.preventDefault();
         handleRestart();
       }
@@ -1490,7 +1543,7 @@ export default function App() {
         onKey
       );
     };
-  }, [handleRestart]);
+  }, [handleRestart, userInput.length]);
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
@@ -1611,7 +1664,7 @@ export default function App() {
             <Timer
               timeLeft={timeLeft}
               totalTime={
-                TOTAL_TIME
+                totalTime
               }
             />
 
@@ -1729,3 +1782,4 @@ export default function App() {
     </div>
   );
 }
+
