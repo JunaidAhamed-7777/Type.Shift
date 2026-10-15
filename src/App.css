@@ -542,9 +542,9 @@ dd {
   text-underline-offset: 5px;
 }
 .char-cursor {
-  color: var(--pending);
   position: relative;
 }
+.char-selected { background: var(--accent-soft); text-decoration: underline; text-underline-offset: 5px; }
 .char-cursor::before {
   content: "";
   position: absolute;
@@ -569,9 +569,10 @@ dd {
   background: transparent;
   caret-color: transparent;
   resize: none;
-  font: 16px var(--font-mono);
+  font: 22px/1.95 var(--font-mono);
+  letter-spacing: -0.025em;
   cursor: text;
-  padding: 0;
+  padding: 12px 5px 17px;
 }
 .hidden-input:focus {
   outline: none;
@@ -1090,6 +1091,7 @@ kbd {
     font-size: 20px;
     line-height: 1.9;
   }
+  .hidden-input { font-size: 20px; line-height: 1.9; }
   .test-panel-header {
     padding: 24px 25px 0;
   }
@@ -1233,6 +1235,7 @@ kbd {
     line-height: 1.95;
     letter-spacing: -0.035em;
   }
+  .hidden-input { font-size: 18px; line-height: 1.95; letter-spacing: -0.035em; padding: 6px 3px 13px; }
   .typing-prompt {
     font-size: 10px;
     line-height: 1.7;

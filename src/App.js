@@ -336,6 +336,11 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
   const focusTimeRef = useRef(0);
   const composingRef = useRef(false);
   const [compositionDraft, setCompositionDraft] = useState(null);
+  const [selection, setSelection] = useState([0, 0]);
+  const displayInput = compositionDraft ?? userInput;
+  const syncSelection = (event) => {
+    setSelection([event.currentTarget.selectionStart, event.currentTarget.selectionEnd]);
+  };
   const [focused, setFocused] = useState(false);
   const [inputNotice, setInputNotice] = useState("");
   useEffect(() => () => focusTimersRef.current.forEach(clearTimeout), []);
@@ -515,15 +520,15 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
         {word.split("").map((char) => {
           const i = index++;
           const cls =
-            i < userInput.length
-              ? userInput[i] === char
+            i < displayInput.length
+              ? displayInput[i] === char
                 ? "char-correct"
                 : "char-wrong"
-              : i === userInput.length
-                ? "char-cursor"
-                : "char-pending";
+              : "char-pending";
+          const caret = i === selection[0] ? " char-cursor" : "";
+          const selected = i >= selection[0] && i < selection[1] ? " char-selected" : "";
           return (
-            <span key={i} className={cls}>
+            <span key={i} className={`${cls}${caret}${selected}`}>
               {char}
             </span>
           );
@@ -546,16 +551,19 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
         className="hidden-input resize-none"
         value={compositionDraft ?? userInput}
         onChange={(event) => {
+          syncSelection(event);
           if (composingRef.current) setCompositionDraft(event.target.value);
           else onInput(event.target.value);
         }}
         onFocus={handleInputFocus}
+        onSelect={syncSelection}
         onBlur={() => setFocused(false)}
         onCompositionStart={() => {
           composingRef.current = true;
           setCompositionDraft(userInput);
         }}
         onCompositionEnd={(event) => {
+          syncSelection(event);
           composingRef.current = false;
           setCompositionDraft(null);
           onInput(event.currentTarget.value);
