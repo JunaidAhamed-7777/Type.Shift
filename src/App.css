@@ -103,7 +103,10 @@
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
 }
 @supports selector(::-webkit-scrollbar) {
-  * { scrollbar-width: auto; scrollbar-color: auto; }
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
 }
 *::-webkit-scrollbar {
   width: 12px;
@@ -123,8 +126,12 @@
 *::-webkit-scrollbar-thumb:active {
   background: var(--scroll-active);
 }
-*::-webkit-scrollbar-corner { background: var(--scroll-track); }
-*::-webkit-scrollbar-button { display: none; }
+*::-webkit-scrollbar-corner {
+  background: var(--scroll-track);
+}
+*::-webkit-scrollbar-button {
+  display: none;
+}
 html {
   font-size: 16px;
   scroll-padding-top: 24px;
@@ -248,8 +255,12 @@ dd {
   color: var(--brand-white);
 }
 :root:not([data-theme="dark"]) .logo-type,
-:root:not([data-theme="dark"]) .logo-dot { color: var(--accent); }
-:root:not([data-theme="dark"]) .logo-bracket { color: var(--ink); }
+:root:not([data-theme="dark"]) .logo-dot {
+  color: var(--accent);
+}
+:root:not([data-theme="dark"]) .logo-bracket {
+  color: var(--ink);
+}
 .brand:hover {
   outline: 1px solid var(--accent);
   outline-offset: 3px;
@@ -278,13 +289,39 @@ dd {
   bottom: 0;
   border-radius: 2px;
   pointer-events: none;
-  transition: transform 360ms cubic-bezier(.2,.8,.2,1), width 360ms cubic-bezier(.2,.8,.2,1);
+  transition:
+    transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.nav-item { white-space: nowrap; }
-.nav-item.is-active { color: var(--ink); }
-.header-navigation .github-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 13px; font-size: 12px; }
-.github-button svg { width: 14px; height: 14px; }
-.github-button:hover { background: var(--accent-soft); border-color: var(--accent); }
+.nav-item {
+  white-space: nowrap;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+}
+.nav-item.is-active {
+  color: var(--ink);
+}
+.header-navigation .github-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 13px;
+  font-size: 12px;
+}
+.github-button svg {
+  width: 14px;
+  height: 14px;
+}
+.github-button:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
 .app-header nav a:hover {
   color: var(--accent);
 }
@@ -1061,7 +1098,9 @@ kbd {
   opacity: 0.24;
   pointer-events: none;
 }
-:root[data-theme="dark"] .matrix-bg { opacity: 0.18; }
+:root[data-theme="dark"] .matrix-bg {
+  opacity: 0.18;
+}
 @keyframes caret-blink {
   0%,
   48% {
@@ -1123,8 +1162,16 @@ kbd {
     gap: 14px;
     justify-content: space-between;
   }
-  .nav-tabs { gap: 24px; }
-  .app-header .theme-toggle { position: absolute; right: 0; top: 22px; }
+  .nav-tabs {
+    gap: 24px;
+  }
+  .app-header .theme-toggle {
+    position: absolute;
+    right: 0;
+    top: 18px;
+    width: 42px;
+    height: 42px;
+  }
   .page-main {
     margin-top: 27px;
   }
@@ -1422,9 +1469,16 @@ kbd {
   .result-screen {
     padding: 28px 19px;
   }
-  .result-source { gap: 18px; }
-  .result-source img { width: 96px; height: 144px; }
-  .result-source p { font-size: 13px; }
+  .result-source {
+    gap: 18px;
+  }
+  .result-source img {
+    width: 96px;
+    height: 144px;
+  }
+  .result-source p {
+    font-size: 13px;
+  }
   .result-grid {
     margin-top: 25px;
   }
@@ -1477,7 +1531,9 @@ kbd {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .nav-underline { transition: none; }
+  .nav-underline {
+    transition: none;
+  }
   :root,
   .shift-key {
     transition: none;

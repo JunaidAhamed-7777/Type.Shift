@@ -1,4 +1,10 @@
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+} from "react";
 import "./App.css";
 
 import { FaGithub, FaGlobe } from "react-icons/fa";
@@ -127,7 +133,8 @@ function HeaderNavigation({ helpOpen, onHelp }) {
       setIndicator({ width: bounds.width, left: bounds.left - parent.left });
     };
     measure();
-    const observer = typeof ResizeObserver === "function" ? new ResizeObserver(measure) : null;
+    const observer =
+      typeof ResizeObserver === "function" ? new ResizeObserver(measure) : null;
     if (observer && tabsRef.current) observer.observe(tabsRef.current);
     window.addEventListener("resize", measure);
     document.fonts?.ready.then(measure);
@@ -139,17 +146,50 @@ function HeaderNavigation({ helpOpen, onHelp }) {
   }, [helpOpen]);
 
   return (
-    <nav className="header-navigation" aria-label="Main navigation" data-active={helpOpen ? "help" : "test"}>
+    <nav
+      className="header-navigation"
+      aria-label="Main navigation"
+      data-active={helpOpen ? "help" : "test"}
+    >
       <div className="nav-tabs" ref={tabsRef}>
-        <a ref={testRef} className={`nav-item ${!helpOpen ? "is-active" : ""}`} href="#typing-test" aria-current={!helpOpen ? "page" : undefined}>
+        <a
+          ref={testRef}
+          className={`nav-item ${!helpOpen ? "is-active" : ""}`}
+          href="#typing-test"
+          aria-current={!helpOpen ? "page" : undefined}
+        >
           <span className="nav-label">Typing test</span>
         </a>
-        <button ref={helpRef} className={`nav-help nav-item ${helpOpen ? "is-active" : ""}`} onClick={onHelp} aria-haspopup="dialog" aria-expanded={helpOpen}>
-          <span className="nav-label">How it works</span><FiArrowUpRight aria-hidden="true" />
+        <button
+          ref={helpRef}
+          className={`nav-help nav-item ${helpOpen ? "is-active" : ""}`}
+          onClick={onHelp}
+          aria-haspopup="dialog"
+          aria-expanded={helpOpen}
+        >
+          <span className="nav-label">How it works</span>
+          <FiArrowUpRight aria-hidden="true" />
         </button>
-        <span className="nav-underline" aria-hidden="true" style={{ width: indicator.width, transform: `translateX(${indicator.left}px)` }} />
+        <span
+          className="nav-underline"
+          aria-hidden="true"
+          style={{
+            width: indicator.width,
+            transform: `translateX(${indicator.left}px)`,
+          }}
+        />
       </div>
-      <a className="github-button" href="https://github.com/JunaidAhamed-7777/Type.Shift" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository (opens in a new tab)"><FaGithub aria-hidden="true" /><span>GitHub</span><FiArrowUpRight aria-hidden="true" /></a>
+      <a
+        className="github-button"
+        href="https://github.com/JunaidAhamed-7777/Type.Shift"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub repository (opens in a new tab)"
+      >
+        <FaGithub aria-hidden="true" />
+        <span>GitHub</span>
+        <FiArrowUpRight aria-hidden="true" />
+      </a>
       <AppearanceToggle />
     </nav>
   );
@@ -770,7 +810,10 @@ function startMatrix(canvasId) {
     canvas.width = Math.round(width * pixelRatio);
     canvas.height = Math.round(height * pixelRatio);
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    rainDrops = Array.from({ length: Math.ceil(width / fontSize) }, () => Math.random() * height / fontSize);
+    rainDrops = Array.from(
+      { length: Math.ceil(width / fontSize) },
+      () => (Math.random() * height) / fontSize,
+    );
   };
 
   const draw = () => {
@@ -1351,7 +1394,10 @@ export default function App() {
           <span className="logo-shift">Shift</span>
           <span className="logo-bracket">]</span>
         </a>
-        <HeaderNavigation helpOpen={showLightbox} onHelp={() => setShowLightbox(true)} />
+        <HeaderNavigation
+          helpOpen={showLightbox}
+          onHelp={() => setShowLightbox(true)}
+        />
       </header>
       <main className="page-main">
         <section className="intro" aria-labelledby="intro-title">

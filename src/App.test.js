@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "./App";
 
@@ -62,6 +62,9 @@ test("waits for actual typing and does not take focus on page load", () => {
     screen.getByText("There Is Something Wrong With You, And I Love It."),
   ).toBeInTheDocument();
   expect(screen.getByRole("contentinfo")).toHaveTextContent("By Junaid");
+  expect(screen.getByRole("contentinfo")).not.toHaveTextContent(
+    /With Love|For My Cheeku/i,
+  );
 
   clock += 120000;
   act(() => jest.advanceTimersByTime(120000));
@@ -156,6 +159,50 @@ test("clamps excess input and scores completion using exact elapsed time", () =>
   expect(screen.getByRole("heading", { level: 2 })).toHaveFocus();
 });
 
+test("runs result rain, resizes its canvas, and cleans up when restarting", () => {
+  window.matchMedia.mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  }));
+  jest.spyOn(document, "hidden", "get").mockReturnValue(false);
+  const context = {
+    setTransform: jest.fn(),
+    fillRect: jest.fn(),
+    fillText: jest.fn(),
+  };
+  jest
+    .spyOn(HTMLCanvasElement.prototype, "getContext")
+    .mockReturnValue(context);
+  render(<App />);
+  expect(context.fillText).not.toHaveBeenCalled();
+
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "s" } });
+  clock += 2000;
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady hands" },
+  });
+  expect(context.fillText).toHaveBeenCalled();
+  const firstFrameDraws = context.fillText.mock.calls.length;
+  act(() => jest.advanceTimersByTime(60));
+  expect(context.fillText.mock.calls.length).toBeGreaterThan(firstFrameDraws);
+
+  context.setTransform.mockClear();
+  fireEvent(window, new Event("resize"));
+  expect(context.setTransform).toHaveBeenCalledTimes(1);
+
+  fireEvent.click(screen.getByRole("button", { name: /another round/i }));
+  expect(screen.getByRole("textbox")).toBeInTheDocument();
+  const finishedDraws = context.fillText.mock.calls.length;
+  context.setTransform.mockClear();
+  act(() => jest.advanceTimersByTime(300));
+  fireEvent(window, new Event("resize"));
+  fireEvent(document, new Event("visibilitychange"));
+  expect(context.fillText).toHaveBeenCalledTimes(finishedDraws);
+  expect(context.setTransform).not.toHaveBeenCalled();
+});
+
 test("changing duration resets the test without moving focus or starting the clock", () => {
   render(<App />);
   fireEvent.change(screen.getByRole("textbox"), {
@@ -197,6 +244,76 @@ test("help blocks background typing, preserves Tab, and restores focus on close"
 
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(about).toHaveFocus();
+});
+
+test.each(["Close button", "Escape"])(
+  "moves the navigation selection to help and restores typing after %s",
+  (dismissal) => {
+    render(<App />);
+    const navigation = screen.getByRole("navigation", {
+      name: "Main navigation",
+    });
+    const typing = within(navigation).getByRole("link", {
+      name: "Typing test",
+    });
+    const help = within(navigation).getByRole("button", {
+      name: /how it works/i,
+    });
+    const selection = navigation.matches("[data-active]")
+      ? navigation
+      : navigation.querySelector("[data-active]");
+
+    expect(selection).toHaveAttribute("data-active", "test");
+    expect(typing).toHaveAttribute("aria-current", "page");
+    expect(help).toHaveAttribute("aria-expanded", "false");
+
+    help.focus();
+    fireEvent.click(help);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(selection).toHaveAttribute("data-active", "help");
+    expect(typing).not.toHaveAttribute("aria-current");
+    expect(help).toHaveAttribute("aria-expanded", "true");
+
+    if (dismissal === "Escape") {
+      // Native dialogs dispatch cancel when Escape is pressed.
+      fireEvent(
+        screen.getByRole("dialog"),
+        new Event("cancel", { cancelable: true }),
+      );
+    } else {
+      fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
+    }
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(selection).toHaveAttribute("data-active", "test");
+    expect(typing).toHaveAttribute("aria-current", "page");
+    expect(help).toHaveAttribute("aria-expanded", "false");
+    expect(help).toHaveFocus();
+  },
+);
+
+test("provides a header link to the repository with a safe new-tab target", () => {
+  render(<App />);
+  const navigation = screen.getByRole("navigation", {
+    name: "Main navigation",
+  });
+  const repository = within(navigation).getByRole("link", {
+    name: "GitHub repository (opens in a new tab)",
+  });
+
+  expect(repository).toHaveAttribute(
+    "href",
+    "https://github.com/JunaidAhamed-7777/Type.Shift",
+  );
+  expect(repository).toHaveAttribute("target", "_blank");
+  expect(repository).toHaveAttribute(
+    "rel",
+    expect.stringContaining("noopener"),
+  );
+  expect(repository).toHaveAttribute(
+    "rel",
+    expect.stringContaining("noreferrer"),
+  );
 });
 
 test("changing difficulty resets without moving focus, and reselecting it keeps progress", () => {
