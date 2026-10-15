@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
 import { FaGithub, FaGlobe } from "react-icons/fa";
+import { FiArrowUpRight, FiArrowRight, FiRotateCcw, FiSun, FiMoon, FiX, FiCornerDownLeft, FiClock, FiCode, FiBookOpen, FiCheck, FiArrowUp } from "react-icons/fi";
 import { Analytics } from "@vercel/analytics/react";
 import PARAGRAPHS from "./data/paragraphs";
-import DarkVeil from "./components/DarkVeil";
 
 // ─── Session-based "no repeat" tracker ─────────────────────────────
 const usedIndices = {
@@ -43,194 +43,86 @@ function getRandomParagraph(difficulty) {
 }
 
 // ─── Performance rating ─────────────────────────────────────────────
-function getPerformanceLabel(wpm, accuracy, timeTaken) {
-  const MAX_WPM = 80;
-  const TOTAL_TIME = 60;
-
-  const wpmScore =
-    (Math.min(wpm, MAX_WPM) / MAX_WPM) * 100;
-
-  const accScore = accuracy;
-
-  const timeScore = Math.max(
-    0,
-    100 - (timeTaken / TOTAL_TIME) * 100
-  );
-
-  const composite =
-    (wpmScore + accScore + timeScore) / 3;
-
-  if (composite >= 80) {
-    return {
-      label: "Expert",
-      color: "#ff6b35",
-    };
-  }
-
-  if (composite >= 60) {
-    return {
-      label: "Advanced",
-      color: "#39ff14",
-    };
-  }
-
-  if (composite >= 40) {
-    return {
-      label: "Intermediate",
-      color: "#00d4ff",
-    };
-  }
-
-  if (composite >= 20) {
-    return {
-      label: "Beginner",
-      color: "#ffd700",
-    };
-  }
-
-  return {
-    label: "Keep Practicing",
-    color: "#a0a0a0",
-  };
+function getPerformanceLabel(wpm, accuracy) {
+  if (accuracy < 80) return { label: "Build your accuracy", color: "var(--accent)" };
+  if (wpm >= 80 && accuracy >= 95) return { label: "Beautifully done", color: "var(--success)" };
+  if (wpm >= 50 && accuracy >= 90) return { label: "Finding your flow", color: "var(--success)" };
+  return { label: "Every session counts", color: "var(--accent)" };
 }
 
 // ─── Timer ──────────────────────────────────────────────────────────
 function Timer({ timeLeft, totalTime }) {
-  const pct = (timeLeft / totalTime) * 100;
-  const isUrgent = timeLeft <= 10;
-
   return (
-    <div className="timer-wrapper">
-      <div
-        className={`timer-display ${
-          isUrgent ? "urgent" : ""
-        }`}
-      >
-        <span className="timer-number">
-          {timeLeft}
-        </span>
-
-        <span className="timer-label">
-          seconds
-        </span>
-      </div>
-
-      <div className="timer-bar-bg">
-        <div
-          className={`timer-bar-fill ${
-            isUrgent ? "urgent" : ""
-          }`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+    <div className={`timer-wrapper ${timeLeft <= 10 ? "urgent" : ""}`}>
+      <FiClock aria-hidden="true" />
+      <span className="timer-number">{String(Math.floor(timeLeft / 60)).padStart(2, "0")}:{String(timeLeft % 60).padStart(2, "0")}</span>
+      <span className="sr-only">remaining of {totalTime} seconds</span>
     </div>
   );
 }
 
 // ─── Live Stats ─────────────────────────────────────────────────────
-function LiveStats({
-  wpm,
-  accuracy,
-  correctChars,
-  totalTyped,
-  onRestart,
-}) {
+function LiveStats({ wpm, accuracy, correctChars, totalTyped }) {
   return (
-    <div className="live-stats">
-      <div className="stat-pill">
-        <span className="stat-val">{wpm}</span>
-        <span className="stat-key">WPM</span>
-      </div>
+    <dl className="live-stats" aria-label="Live typing statistics">
+      <div className="stat"><dt>Words / min</dt><dd>{wpm}<span>wpm</span></dd></div>
+      <div className="stat"><dt>Accuracy</dt><dd>{totalTyped ? accuracy : "—"}<span>{totalTyped ? "%" : ""}</span></dd></div>
+      <div className="stat"><dt>Correct characters</dt><dd>{correctChars}<span>/ {totalTyped}</span></dd></div>
+    </dl>
+  );
+}
 
-      <div className="stat-pill">
-        <span className="stat-val">
-          {accuracy}%
-        </span>
-        <span className="stat-key">ACC</span>
-      </div>
+function AppearanceToggle() {
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem("typeshift-theme") === "dark"; }
+    catch { return false; }
+  });
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    try { localStorage.setItem("typeshift-theme", dark ? "dark" : "light"); } catch { /* Theme still works when storage is unavailable. */ }
+  }, [dark]);
+  return <button className="icon-button theme-toggle" onClick={() => setDark(!dark)} aria-label={`Switch to ${dark ? "light" : "dark"} theme`} title={`Switch to ${dark ? "light" : "dark"} theme`}>{dark ? <FiSun /> : <FiMoon />}</button>;
+}
 
-      <div className="stat-pill">
-        <span className="stat-val">
-          {correctChars}
-        </span>
-        <span className="stat-key">Correct</span>
-      </div>
-
-      <div className="stat-pill">
-        <span className="stat-val">
-          {totalTyped}
-        </span>
-        <span className="stat-key">Typed</span>
-      </div>
-
-      <button
-        className="reset-btn"
-        onClick={onRestart}
-      >
-        ↻
-      </button>
-    </div>
+function Dialog({ title, children, onClose, className = "" }) {
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, []);
+  return (
+    <dialog ref={dialogRef} className={`lightbox ${className}`} aria-labelledby="dialog-title" onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => {
+      const rect = event.currentTarget.getBoundingClientRect();
+      if (event.target === event.currentTarget && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) onClose();
+    }}>
+      <div className="dialog-header"><h2 id="dialog-title">{title}</h2><button className="icon-button" onClick={onClose} aria-label="Close dialog" autoFocus><FiX /></button></div>
+      <div className="lightbox-content">{children}</div>
+    </dialog>
   );
 }
 
 // ─── Welcome Lightbox ───────────────────────────────────────────────
 function WelcomeLightbox({ onClose }) {
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div
-      className="lightbox-backdrop"
-      onMouseDown={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="lightbox-title"
-    >
-      <div className="lightbox">
-        <button
-          className="lightbox-close"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
-
-        <div className="lightbox-content">
-          <h2 id="lightbox-title">
-            Test your typing speed and accuracy with
-            Type.Shift
-          </h2>
-
-          <p>
-            The{" "}
-            <span className="lightbox-green">
-              free
-            </span>{" "}
-            online typing speed tester.
-          </p>
-
-          <p>
-            Choose from different difficulty levels
-            and measure your words per minute (WPM),
-            accuracy, and typing performance.
-          </p>
-
-          <p>
-            Practice with passages from books,
-            scientific texts, and programming
-            algorithms.
-          </p>
-
-          <p className="lightbox-red">
-            No account is required to start a typing
-            test.
-          </p>
-        </div>
-      </div>
-    </div>
+    <Dialog title="A little practice goes a long way." onClose={onClose}>
+      <p>Type.Shift is a free place to practice with passages from books, science, and code. No account required.</p>
+      <ol className="how-to-list">
+        <li><strong>Make it yours.</strong><span>Choose a difficulty and a time limit. Each new test brings a different passage.</span></li>
+        <li><strong>Start with one keystroke.</strong><span>Click or tap the passage, then type what you see. The clock starts with your first character.</span></li>
+        <li><strong>Find your flow.</strong><span>Use Backspace to correct mistakes. Your test ends at the time limit or the end of the passage.</span></li>
+      </ol>
+      <p>Speed is correct characters divided by five, per minute. Accuracy measures how much of your final text matches the passage.</p>
+      <div className="dialog-shortcuts"><span><kbd>Tab</kbd> New passage while typing</span><span><kbd>Esc</kbd> Leave the typing area</span></div>
+      <button className="primary-button" onClick={onClose}>Let's type <FiArrowRight aria-hidden="true" /></button>
+    </Dialog>
   );
 }
 
@@ -285,54 +177,12 @@ function LegalLightbox({ type, onClose }) {
     };
   }, [filePath]);
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div
-      className="lightbox-backdrop"
-      onMouseDown={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="legal-lightbox-title"
-    >
-      <div className="lightbox legal-lightbox">
-        <button
-          className="lightbox-close"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
-
-        <div className="lightbox-content">
-          <h2 id="legal-lightbox-title">
-            {title}
-          </h2>
-
-          {isLoading && (
-            <p className="legal-loading">
-              Loading...
-            </p>
-          )}
-
-          {error && (
-            <p className="legal-error">
-              Unable to load this document.
-            </p>
-          )}
-
-          {!isLoading && !error && (
-            <div className="legal-text">
-              {content}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <Dialog title={title} onClose={onClose} className="legal-lightbox">
+      {isLoading && <p className="legal-loading" role="status">Loading document…</p>}
+      {error && <p className="legal-error" role="alert">This document could not be loaded. <a href={filePath} target="_blank" rel="noopener noreferrer">Open the document directly</a> or try again when you're connected.</p>}
+      {!isLoading && !error && <div className="legal-text">{content}</div>}
+    </Dialog>
   );
 }
 
@@ -945,7 +795,7 @@ export default function App() {
         elapsed
       ) => {
         if (
-          !startTimeRef.current ||
+          startTimeRef.current === null ||
           elapsed <= 0 ||
           correctCount <= 0
         ) {
