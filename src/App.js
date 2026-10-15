@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./App.css";
 
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaGlobe } from "react-icons/fa";
 import { Analytics } from "@vercel/analytics/react";
 import PARAGRAPHS from "./data/paragraphs";
 import DarkVeil from "./components/DarkVeil";
@@ -1661,6 +1661,15 @@ export default function App() {
                 aria-label="GitHub"
               >
                 <FaGithub />
+              </a>
+              <a
+                href="https://junaidahamed.runs-on.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Junaid's personal website (opens in a new tab)"
+                title="Junaid's website"
+              >
+                <FaGlobe />
               </a>
             </div>
           </>
