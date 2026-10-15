@@ -10,6 +10,7 @@
 
 # production
 /build
+/public/metadata-preview.html
 
 # misc
 .DS_Store
