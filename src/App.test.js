@@ -3,12 +3,19 @@ import "@testing-library/jest-dom";
 import App from "./App";
 
 // CRA's Jest resolver predates package exports used by this analytics package.
-jest.mock("@vercel/analytics/react", () => ({ Analytics: () => null }), { virtual: true });
+jest.mock("@vercel/analytics/react", () => ({ Analytics: () => null }), {
+  virtual: true,
+});
 jest.mock("./data/paragraphs", () => {
   const passage = { text: "steady hands", source: "Test source" };
   return {
     __esModule: true,
-    default: { easy: [passage], medium: [passage], hard: [passage], code: [passage] },
+    default: {
+      easy: [passage],
+      medium: [passage],
+      hard: [passage],
+      code: [passage],
+    },
   };
 });
 
@@ -51,7 +58,9 @@ test("waits for actual typing and does not take focus on page load", () => {
   const brand = screen.getByRole("link", { name: "Type.Shift home" });
   expect(brand).toHaveTextContent("Type");
   expect(brand).toHaveTextContent("Shift");
-  expect(screen.getByText("There Is Something Wrong With You, And I Love It.")).toBeInTheDocument();
+  expect(
+    screen.getByText("There Is Something Wrong With You, And I Love It."),
+  ).toBeInTheDocument();
   expect(screen.getByRole("contentinfo")).toHaveTextContent(/for my Cheeku/i);
 
   clock += 120000;
@@ -100,10 +109,14 @@ test("Escape releases the typing field so Tab can navigate again", () => {
 
 test("rejects input after the deadline even before the timer callback runs", () => {
   render(<App />);
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady" },
+  });
 
   clock += 60001;
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady hands" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady hands" },
+  });
 
   expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   expect(screen.getByText("1")).toBeInTheDocument();
@@ -126,7 +139,9 @@ test("clamps excess input and scores completion using exact elapsed time", () =>
 
 test("changing duration resets the test without moving focus or starting the clock", () => {
   render(<App />);
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady" },
+  });
   const duration = screen.getByRole("button", { name: /^15\s*(s|seconds)?$/i });
   duration.focus();
   fireEvent.click(duration);
@@ -138,7 +153,9 @@ test("changing duration resets the test without moving focus or starting the clo
   act(() => jest.advanceTimersByTime(15000));
   expect(screen.getByRole("textbox")).toBeInTheDocument();
 
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady" },
+  });
   clock += 15000;
   act(() => jest.advanceTimersByTime(100));
   expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
@@ -165,7 +182,9 @@ test("help blocks background typing, preserves Tab, and restores focus on close"
 
 test("changing difficulty resets without moving focus, and reselecting it keeps progress", () => {
   render(<App />);
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady" },
+  });
   const hard = screen.getByRole("button", { name: "Hard" });
   hard.focus();
   fireEvent.click(hard);
@@ -173,7 +192,9 @@ test("changing difficulty resets without moving focus, and reselecting it keeps 
   expect(hard).toHaveFocus();
   expect(hard).toHaveAttribute("aria-pressed", "true");
   expect(screen.getByRole("textbox")).toHaveValue("");
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: "steady" } });
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "steady" },
+  });
   fireEvent.click(hard);
   expect(screen.getByRole("textbox")).toHaveValue("steady");
 });
@@ -181,20 +202,27 @@ test("changing difficulty resets without moving focus, and reselecting it keeps 
 test.each([
   ["paste", "Pasting"],
   ["drop", "Dropping text"],
-])("blocks %s with an explanation and leaves the test idle", (eventType, explanation) => {
-  render(<App />);
-  const input = screen.getByRole("textbox");
-  expect(fireEvent[eventType](input, {
-    clipboardData: { getData: () => "steady hands" },
-    dataTransfer: { getData: () => "steady hands" },
-  })).toBe(false);
-  expect(input).toHaveValue("");
-  expect(screen.getByText(new RegExp(`${explanation} is off`))).toBeInTheDocument();
+])(
+  "blocks %s with an explanation and leaves the test idle",
+  (eventType, explanation) => {
+    render(<App />);
+    const input = screen.getByRole("textbox");
+    expect(
+      fireEvent[eventType](input, {
+        clipboardData: { getData: () => "steady hands" },
+        dataTransfer: { getData: () => "steady hands" },
+      }),
+    ).toBe(false);
+    expect(input).toHaveValue("");
+    expect(
+      screen.getByText(new RegExp(`${explanation} is off`)),
+    ).toBeInTheDocument();
 
-  clock += 120000;
-  act(() => jest.advanceTimersByTime(120000));
-  expect(screen.getByRole("textbox")).toBeInTheDocument();
-});
+    clock += 120000;
+    act(() => jest.advanceTimersByTime(120000));
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  },
+);
 
 test("keeps IME composition visible and starts timing only after it commits", () => {
   render(<App />);
@@ -206,7 +234,9 @@ test("keeps IME composition visible and starts timing only after it commits", ()
   clock += 120000;
   act(() => jest.advanceTimersByTime(120000));
   expect(screen.getByRole("textbox")).toBeInTheDocument();
-  expect(fireEvent.keyDown(input, { key: "Tab", isComposing: true })).toBe(true);
+  expect(fireEvent.keyDown(input, { key: "Tab", isComposing: true })).toBe(
+    true,
+  );
   fireEvent.compositionEnd(input, { data: "s", target: { value: "s" } });
   expect(input).toHaveValue("s");
 
@@ -227,7 +257,9 @@ test("correcting mistakes restores final-text accuracy without restarting elapse
 
   expect(screen.getByText("100")).toHaveTextContent("100%");
   expect(screen.getByText("72")).toBeInTheDocument();
-  expect(screen.getByText(/12 correct characters out of 12 typed/)).toBeInTheDocument();
+  expect(
+    screen.getByText(/12 correct characters out of 12 typed/),
+  ).toBeInTheDocument();
 });
 
 test("help can close and reopen while restoring its opener and document scroll", () => {
@@ -249,7 +281,9 @@ test("help can close and reopen while restoring its opener and document scroll",
 test("starts dark and persists appearance choices across remounts", () => {
   const firstRender = render(<App />);
   expect(document.documentElement).toHaveAttribute("data-theme", "dark");
-  fireEvent.click(screen.getByRole("button", { name: "Switch to light theme" }));
+  fireEvent.click(
+    screen.getByRole("button", { name: "Switch to light theme" }),
+  );
   expect(document.documentElement).toHaveAttribute("data-theme", "light");
   expect(localStorage.getItem("typeshift-theme")).toBe("light");
   firstRender.unmount();
@@ -263,7 +297,12 @@ test("starts dark and persists appearance choices across remounts", () => {
 
 test("shows legal loading and content, then restores the privacy opener", async () => {
   let resolveRequest;
-  global.fetch = jest.fn(() => new Promise((resolve) => { resolveRequest = resolve; }));
+  global.fetch = jest.fn(
+    () =>
+      new Promise((resolve) => {
+        resolveRequest = resolve;
+      }),
+  );
   render(<App />);
   const privacy = screen.getByRole("button", { name: "Privacy" });
   privacy.focus();
@@ -272,47 +311,76 @@ test("shows legal loading and content, then restores the privacy opener", async 
   expect(global.fetch).toHaveBeenCalledWith("/legal/privacy.txt");
   expect(screen.getByRole("status")).toHaveTextContent("Loading document");
   await act(async () => {
-    resolveRequest({ ok: true, text: async () => "Test privacy document content." });
+    resolveRequest({
+      ok: true,
+      text: async () => "Test privacy document content.",
+    });
   });
 
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
-  expect(screen.getByRole("dialog", { name: "Privacy Policy" })).toHaveTextContent("Test privacy document content.");
+  expect(
+    screen.getByRole("dialog", { name: "Privacy Policy" }),
+  ).toHaveTextContent("Test privacy document content.");
   fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
   expect(privacy).toHaveFocus();
 });
 
-test.each(["network", "HTTP"])("shows a usable document link after a %s legal failure", async (failure) => {
-  global.fetch = failure === "network"
-    ? jest.fn().mockRejectedValue(new Error("Offline"))
-    : jest.fn().mockResolvedValue({ ok: false });
-  render(<App />);
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "Terms" }));
-  });
+test.each(["network", "HTTP"])(
+  "shows a usable document link after a %s legal failure",
+  async (failure) => {
+    global.fetch =
+      failure === "network"
+        ? jest.fn().mockRejectedValue(new Error("Offline"))
+        : jest.fn().mockResolvedValue({ ok: false });
+    render(<App />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Terms" }));
+    });
 
-  expect(global.fetch).toHaveBeenCalledWith("/legal/usage.txt");
-  expect(screen.queryByRole("status")).not.toBeInTheDocument();
-  expect(screen.getByRole("alert")).toHaveTextContent("This document could not be loaded");
-  expect(screen.getByRole("link", { name: "Open the document directly" })).toHaveAttribute("href", "/legal/usage.txt");
-});
+    expect(global.fetch).toHaveBeenCalledWith("/legal/usage.txt");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "This document could not be loaded",
+    );
+    expect(
+      screen.getByRole("link", { name: "Open the document directly" }),
+    ).toHaveAttribute("href", "/legal/usage.txt");
+  },
+);
 
 test("ignores a legal response arriving after that document was closed", async () => {
   let resolvePrivacy;
-  const privacyResponse = new Promise((resolve) => { resolvePrivacy = resolve; });
-  global.fetch = jest.fn((url) => url === "/legal/privacy.txt"
-    ? privacyResponse
-    : Promise.resolve({ ok: true, text: async () => "Current terms content." }));
+  const privacyResponse = new Promise((resolve) => {
+    resolvePrivacy = resolve;
+  });
+  global.fetch = jest.fn((url) =>
+    url === "/legal/privacy.txt"
+      ? privacyResponse
+      : Promise.resolve({
+          ok: true,
+          text: async () => "Current terms content.",
+        }),
+  );
   render(<App />);
   fireEvent.click(screen.getByRole("button", { name: "Privacy" }));
   fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "Terms" }));
   });
-  expect(screen.getByRole("dialog", { name: "Terms of Use" })).toHaveTextContent("Current terms content.");
+  expect(
+    screen.getByRole("dialog", { name: "Terms of Use" }),
+  ).toHaveTextContent("Current terms content.");
 
   await act(async () => {
-    resolvePrivacy({ ok: true, text: async () => "Outdated privacy response." });
+    resolvePrivacy({
+      ok: true,
+      text: async () => "Outdated privacy response.",
+    });
   });
-  expect(screen.queryByText("Outdated privacy response.")).not.toBeInTheDocument();
-  expect(screen.getByRole("dialog", { name: "Terms of Use" })).toHaveTextContent("Current terms content.");
+  expect(
+    screen.queryByText("Outdated privacy response."),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: "Terms of Use" }),
+  ).toHaveTextContent("Current terms content.");
 });
