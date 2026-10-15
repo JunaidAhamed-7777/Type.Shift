@@ -76,6 +76,7 @@ Source attribution and appropriate cover images are maintained for applicable no
 * `Esc` and `Shift+Tab` to leave the typing input
 * Responsive layout for desktop and mobile
 * Dark theme by default, with a light theme toggle and a locally saved theme preference
+* Hold `Shift` to smoothly change green accents to red; mobile accents alternate every five seconds
 * Locally hosted fonts bundled through Fontsource
 * Keyboard-accessible “How it works” help dialog
 * Privacy Policy and Terms of Use dialogs
@@ -308,6 +309,12 @@ npm run build
 ```
 
 Before submitting changes, run the tests and production build, then verify the modified functionality in the browser at desktop and mobile widths.
+
+---
+
+## Dependency Audit
+
+The October 15, 2026 audit applied compatible dependency updates and removed the three critical findings. The inherited Create React App toolchain still reports dependency vulnerabilities (3 low, 34 moderate, and 59 high package findings). These remain unresolved; a forced breaking update was not applied. Recheck with `npm audit` before changing or deploying the development toolchain.
 
 ---
 

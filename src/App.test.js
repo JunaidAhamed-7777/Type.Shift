@@ -84,6 +84,25 @@ test("keeps Tab navigation outside the typing field and with modifiers", () => {
   expect(input).toHaveValue("steady");
 });
 
+test("renders the actual caret position and selected characters when editing earlier text", () => {
+  render(<App />);
+  const input = screen.getByRole("textbox");
+  act(() => input.focus());
+  fireEvent.change(input, { target: { value: "steady" } });
+  input.setSelectionRange(2, 2);
+  fireEvent.select(input);
+  expect(document.querySelector(".char-cursor")).toHaveTextContent("e");
+  expect(document.querySelectorAll(".char-selected")).toHaveLength(0);
+
+  input.setSelectionRange(1, 4);
+  fireEvent.select(input);
+  const selected = [...document.querySelectorAll(".char-selected")];
+  expect(selected.map((character) => character.textContent).join("")).toBe(
+    "tea",
+  );
+  expect(input).toHaveValue("steady");
+});
+
 test("restarts with an unmodified Tab while typing", () => {
   render(<App />);
   const input = screen.getByRole("textbox");
