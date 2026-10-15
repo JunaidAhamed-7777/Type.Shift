@@ -74,11 +74,12 @@ function LiveStats({ wpm, accuracy, correctChars, totalTyped }) {
 
 function AppearanceToggle() {
   const [dark, setDark] = useState(() => {
-    try { return localStorage.getItem("typeshift-theme") === "dark"; }
-    catch { return false; }
+    try { return localStorage.getItem("typeshift-theme") !== "light"; }
+    catch { return true; }
   });
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
     try { localStorage.setItem("typeshift-theme", dark ? "dark" : "light"); } catch { /* Theme still works when storage is unavailable. */ }
   }, [dark]);
   return <button className="icon-button theme-toggle" onClick={() => setDark(!dark)} aria-label={`Switch to ${dark ? "light" : "dark"} theme`} title={`Switch to ${dark ? "light" : "dark"} theme`}>{dark ? <FiSun /> : <FiMoon />}</button>;
@@ -541,7 +542,7 @@ function startMatrix(canvasId) {
     );
 
     context.fillStyle =
-      "#a84259";
+      "#39ff14";
 
     context.font =
       fontSize + "px monospace";
@@ -1336,12 +1337,12 @@ export default function App() {
       {legalType && <LegalLightbox type={legalType} onClose={() => setLegalType(null)} />}
       {isFinished && <canvas id="matrix-bg" className="matrix-bg" aria-hidden="true" />}
       <header className="app-header">
-        <a className="brand" href="/" aria-label="Type.Shift home"><span className="brand-key"><FiArrowUp aria-hidden="true" /></span><span>type<span className="brand-dot">.</span>shift</span></a>
+        <a className="brand" href="/" aria-label="Type.Shift home"><span className="logo-bracket">[</span><span className="logo-type">Type</span><span className="logo-dot">.</span><span className="logo-shift">Shift</span><span className="logo-bracket">]</span></a>
         <nav aria-label="Main navigation"><a className="nav-current" href="#typing-test">Typing test</a><button className="nav-help" onClick={() => setShowLightbox(true)}>How it works <FiArrowUpRight aria-hidden="true" /></button><AppearanceToggle /></nav>
       </header>
       <main className="page-main">
         <section className="intro" aria-labelledby="intro-title">
-          <div><h1 id="intro-title">Find your <span>rhythm.</span></h1><p>A little focus. A few words. A faster you.</p></div>
+          <div><h1 id="intro-title">Find your <span>rhythm.</span></h1><p>There Is Something Wrong With You, And I Love It.</p></div>
           <div className="key-composition" aria-hidden="true"><span className="little-key key-t">t</span><span className="little-key key-y">y</span><span className="little-key key-p">p</span><span className="little-key key-e">e</span><span className="shift-key"><FiArrowUp /> shift</span></div>
         </section>
         <section id="typing-test" className="practice" aria-label="Typing test" tabIndex={-1}>
@@ -1362,7 +1363,7 @@ export default function App() {
         </section>
         <p className="closing-note">Less rush. More rhythm.<span>Enjoy the practice.</span></p>
       </main>
-      <footer className="app-footer"><p>With love, for my Cheeku.<span>Made by Junaid.</span></p><div className="footer-right"><div className="legal-links"><button onClick={() => setLegalType("privacy")}>Privacy</button><button onClick={() => setLegalType("terms")}>Terms</button></div><span className="footer-divider" /><div className="social-links"><a href="https://github.com/JunaidAhamed-7777/Type.Shift" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)" title="View source on GitHub"><FaGithub /></a><a href="https://junaidahamed.runs-on.dev" target="_blank" rel="noopener noreferrer" aria-label="Junaid's personal website (opens in a new tab)" title="Junaid's website"><FaGlobe /></a></div></div></footer>
+      <footer className="app-footer"><p>With Love · For My Cheeku · By Junaid</p><div className="footer-right"><div className="legal-links"><button onClick={() => setLegalType("privacy")}>Privacy</button><button onClick={() => setLegalType("terms")}>Terms</button></div><span className="footer-divider" /><div className="social-links"><a href="https://github.com/JunaidAhamed-7777/Type.Shift" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)" title="View source on GitHub"><FaGithub /></a><a href="https://junaidahamed.runs-on.dev" target="_blank" rel="noopener noreferrer" aria-label="Junaid's personal website (opens in a new tab)" title="Junaid's website"><FaGlobe /></a></div></div></footer>
       <Analytics />
     </div>
   );

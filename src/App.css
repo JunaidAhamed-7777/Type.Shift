@@ -4,6 +4,7 @@
 @import '@fontsource/dm-sans/latin-600.css';
 @import '@fontsource/ibm-plex-mono/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
 
 :root {
   color-scheme: light;
@@ -12,17 +13,22 @@
   --surface-soft: #e6eaf0;
   --ink: #25303b;
   --muted: #616b78;
-  --pending: #73808f;
+  --pending: #687585;
   --border: #d5dce5;
-  --accent: #a84259;
-  --accent-soft: #f4e7ec;
-  --accent-hover: #8c3146;
+  --accent: #276f1a;
+  --accent-soft: #e2eedf;
+  --accent-hover: #205a16;
+  --brand-green: #39ff14;
+  --brand-red: #ff3b3b;
+  --brand-white: #ffffff;
+  --brand-surface: #101514;
   --success: #31745b;
   --danger: #b5334a;
   --shadow: 0 12px 40px -24px #26364e40;
   --scroll-thumb: #9aa6b5;
   --scroll-hover: #73808f;
   --scroll-active: #616b78;
+  --font-brand: 'JetBrains Mono', monospace;
   --font-body: 'DM Sans', sans-serif;
   --font-display: 'Bricolage Grotesque', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
@@ -30,18 +36,18 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #1b232d;
-  --surface: #232e3a;
-  --surface-soft: #303d4c;
-  --ink: #e8edf4;
-  --muted: #b3bdca;
-  --pending: #a2afbf;
-  --border: #435064;
-  --accent: #f0a6b8;
-  --accent-soft: #493440;
-  --accent-hover: #ffc1d0;
+  --bg: #101514;
+  --surface: #181f1e;
+  --surface-soft: #26302c;
+  --ink: #e6ede9;
+  --muted: #a5b3aa;
+  --pending: #99aaa0;
+  --border: #3d4b43;
+  --accent: #39ff14;
+  --accent-soft: #283e28;
+  --accent-hover: #a0ff8e;
   --success: #93cfb3;
-  --danger: #ffafbe;
+  --danger: #ff939b;
   --shadow: 0 12px 40px -24px #00000080;
   --scroll-thumb: #64748b;
   --scroll-hover: #8a9bb2;
@@ -72,11 +78,11 @@ h1, h2, p, dl, dd { margin: 0; }
 .skip-link:focus { transform: translateY(0); }
 .app { width: min(1160px, calc(100% - 112px)); margin: 0 auto; min-height: 100svh; display: flex; flex-direction: column; position: relative; }
 .app-header { display: flex; align-items: center; justify-content: space-between; min-height: 112px; gap: 24px; }
-.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font-family: var(--font-display); font-size: 25px; letter-spacing: -.035em; }
-.brand-dot { color: var(--accent); }
-.brand-key { width: 36px; height: 38px; display: grid; place-items: center; color: var(--surface); background: var(--ink); border-radius: 8px; box-shadow: inset 0 -4px 0 #00000025; }
-.brand-key svg { width: 20px; height: 20px; stroke-width: 2; margin-top: -3px; }
-.brand:hover .brand-key { background: var(--accent); }
+.brand { display: inline-flex; align-items: center; gap: 0; text-decoration: none; font-family: var(--font-brand); font-weight: 700; font-size: 24px; letter-spacing: -.04em; background: var(--brand-surface); padding: 8px 11px; border-radius: 7px; }
+.logo-type, .logo-dot { color: var(--brand-green); }
+.logo-shift { color: var(--brand-red); }
+.logo-bracket { color: var(--brand-white); }
+.brand:hover { outline: 1px solid var(--accent); outline-offset: 3px; }
 .app-header nav { display: flex; align-items: center; gap: 30px; font-size: 13px; }
 .app-header nav a { text-decoration: none; padding: 10px 0; }
 .nav-current { color: var(--ink); position: relative; }
@@ -259,8 +265,7 @@ kbd { font-family: var(--font-mono); font-size: 10px; font-weight: 400; line-hei
 @media (max-width: 520px) {
   .app { width: calc(100% - 36px); }
   .app-header { min-height: 80px; gap: 10px; }
-  .brand { font-size: 23px; gap: 9px; }
-  .brand-key { width: 31px; height: 33px; border-radius: 7px; }
+  .brand { font-size: 21px; padding: 7px 8px; }
   .app-header nav { gap: 16px; }
   .nav-help { font-size: 12px; gap: 3px; }
   .nav-help svg { width: 13px; }
@@ -320,7 +325,7 @@ kbd { font-family: var(--font-mono); font-size: 10px; font-weight: 400; line-hei
   .app-header nav { gap: 10px; }
   .nav-help { font-size: 11px; }
   .nav-help svg { display: none; }
-  .brand { font-size: 21px; gap: 7px; }
+  .brand { font-size: 18px; }
   .stat { padding-inline: 10px; }
   .stat dt { font-size: 9px; }
   .app-footer { flex-wrap: wrap; justify-content: center; }

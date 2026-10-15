@@ -4,14 +4,14 @@
   "description": "A free typing speed and accuracy test with literary passages, technical texts, and code.",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "logo.png",
+      "sizes": "454x414",
+      "type": "image/png",
       "purpose": "any"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#eef1f5",
-  "background_color": "#eef1f5"
+  "theme_color": "#101514",
+  "background_color": "#101514"
 }
