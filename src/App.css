@@ -232,8 +232,8 @@ dd {
   font-weight: 700;
   font-size: 24px;
   letter-spacing: -0.04em;
-  background: var(--brand-surface);
-  padding: 8px 11px;
+  background: transparent;
+  padding: 8px 0;
   border-radius: 7px;
 }
 .logo-type,
@@ -246,34 +246,44 @@ dd {
 .logo-bracket {
   color: var(--brand-white);
 }
+:root:not([data-theme="dark"]) .logo-type,
+:root:not([data-theme="dark"]) .logo-dot { color: var(--accent); }
+:root:not([data-theme="dark"]) .logo-bracket { color: var(--ink); }
 .brand:hover {
   outline: 1px solid var(--accent);
   outline-offset: 3px;
 }
-.app-header nav {
+.header-navigation {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
   font-size: 13px;
 }
 .app-header nav a {
   text-decoration: none;
   padding: 10px 0;
 }
-.nav-current {
-  color: var(--ink);
+.nav-tabs {
+  display: flex;
+  gap: 30px;
+  align-items: center;
   position: relative;
 }
-.nav-current::after {
-  content: "";
+.nav-underline {
   height: 3px;
-  width: 16px;
   background: var(--accent);
   position: absolute;
   left: 0;
-  bottom: 1px;
+  bottom: 0;
   border-radius: 2px;
+  pointer-events: none;
+  transition: transform 360ms cubic-bezier(.2,.8,.2,1), width 360ms cubic-bezier(.2,.8,.2,1);
 }
+.nav-item { white-space: nowrap; }
+.nav-item.is-active { color: var(--ink); }
+.header-navigation .github-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border: 1px solid var(--border); border-radius: 8px; padding: 10px 13px; font-size: 12px; }
+.github-button svg { width: 14px; height: 14px; }
+.github-button:hover { background: var(--accent-soft); border-color: var(--accent); }
 .app-header nav a:hover {
   color: var(--accent);
 }
@@ -1098,14 +1108,19 @@ kbd {
     width: calc(100% - 40px);
   }
   .app-header {
-    min-height: 92px;
+    min-height: 0;
+    flex-wrap: wrap;
+    position: relative;
+    padding-block: 18px;
+    row-gap: 12px;
   }
-  .app-header nav {
-    gap: 20px;
+  .header-navigation {
+    width: 100%;
+    gap: 14px;
+    justify-content: space-between;
   }
-  .nav-current {
-    display: none;
-  }
+  .nav-tabs { gap: 24px; }
+  .app-header .theme-toggle { position: absolute; right: 0; top: 22px; }
   .page-main {
     margin-top: 27px;
   }
@@ -1196,12 +1211,12 @@ kbd {
     width: calc(100% - 36px);
   }
   .app-header {
-    min-height: 80px;
+    min-height: 0;
     gap: 10px;
   }
   .brand {
     font-size: 21px;
-    padding: 7px 8px;
+    padding: 7px 0;
   }
   .app-header nav {
     gap: 16px;
@@ -1455,6 +1470,7 @@ kbd {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .nav-underline { transition: none; }
   :root,
   .shift-key {
     transition: none;
