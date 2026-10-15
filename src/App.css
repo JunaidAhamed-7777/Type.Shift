@@ -656,6 +656,7 @@ dd {
 }
 .char-cursor::before {
   content: "";
+  visibility: hidden;
   position: absolute;
   width: 2px;
   height: 1.25em;
@@ -665,6 +666,7 @@ dd {
   background: var(--accent);
 }
 .typing-box:focus-within .char-cursor::before {
+  visibility: visible;
   animation: caret-blink 1.1s step-end infinite;
 }
 .hidden-input {
