@@ -100,7 +100,14 @@ function Dialog({ title, children, onClose, className = "" }) {
     };
   }, []);
   return (
-    <dialog ref={dialogRef} className={`lightbox ${className}`} aria-labelledby="dialog-title" onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => {
+    <dialog ref={dialogRef} className={`lightbox ${className}`} aria-labelledby="dialog-title" onCancel={(event) => { event.preventDefault(); onClose(); }} onKeyDown={(event) => {
+      if (event.key !== "Tab" || event.isComposing) return;
+      const controls = [...event.currentTarget.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), [tabindex="0"]')];
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (event.shiftKey && event.target === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && event.target === last) { event.preventDefault(); first?.focus(); }
+    }} onClick={(event) => {
       const rect = event.currentTarget.getBoundingClientRect();
       if (event.target === event.currentTarget && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) onClose();
     }}>
@@ -199,6 +206,7 @@ function TypingBox({
   const focusTimersRef = useRef([]);
   const focusTimeRef = useRef(0);
   const composingRef = useRef(false);
+  const [compositionDraft, setCompositionDraft] = useState(null);
   const [focused, setFocused] = useState(false);
   const [inputNotice, setInputNotice] = useState("");
   useEffect(() => () => focusTimersRef.current.forEach(clearTimeout), []);
@@ -430,13 +438,16 @@ function TypingBox({
       <textarea
         id="typing-input"
         ref={inputRef}
-        className="hidden-input"
-        value={userInput}
-        onChange={(event) => { if (!composingRef.current) onInput(event.target.value); }}
+        className="hidden-input resize-none"
+        value={compositionDraft ?? userInput}
+        onChange={(event) => {
+          if (composingRef.current) setCompositionDraft(event.target.value);
+          else onInput(event.target.value);
+        }}
         onFocus={handleInputFocus}
         onBlur={() => setFocused(false)}
-        onCompositionStart={() => { composingRef.current = true; }}
-        onCompositionEnd={(event) => { composingRef.current = false; onInput(event.currentTarget.value); }}
+        onCompositionStart={() => { composingRef.current = true; setCompositionDraft(userInput); }}
+        onCompositionEnd={(event) => { composingRef.current = false; setCompositionDraft(null); onInput(event.currentTarget.value); }}
         onPaste={(event) => { event.preventDefault(); setInputNotice("Type each character to keep your result accurate. Pasting is off for this test."); }}
         onDrop={(event) => { event.preventDefault(); setInputNotice("Type each character to keep your result accurate. Dropping text is off for this test."); }}
         maxLength={paragraph.length}
