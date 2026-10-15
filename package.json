@@ -1,6 +1,17 @@
 {
   "name": "typing-speed-test",
   "version": "0.1.0",
+  "description": "Type.Shift is a free typing speed and accuracy test with passages from books, science, and code.",
+  "homepage": "https://typeshiftt.vercel.app/",
+  "author": {
+    "name": "Junaid Ahamed",
+    "url": "https://junaidahamed.runs-on.dev/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JunaidAhamed-7777/Type.Shift.git"
+  },
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@fontsource-variable/azeret-mono": "^5.3.0",
@@ -26,6 +37,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "verify:metadata": "node scripts/validate-metadata.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

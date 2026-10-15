@@ -117,17 +117,22 @@ Type.Shift/
 │   │   ├── privacy.txt
 │   │   └── usage.txt
 │   ├── 404.html
-│   ├── Ads.txt
-│   ├── faicon.ico
+│   ├── ads.txt
+│   ├── favicon.ico
+│   ├── icons/
 │   ├── index.html
 │   ├── logo.png
 │   ├── manifest.json
-│   └── robots.txt
+│   ├── robots.txt
+│   ├── sitemap.xml
+│   └── social-preview.jpg
 ├── scripts/
 │   ├── logs/
 │   │   └── placeholders.txt
 │   ├── addPlaceholder.js
-│   └── fetchCovers.js
+│   ├── fetchCovers.js
+│   ├── prepare-metadata-artwork.js
+│   └── validate-metadata.js
 ├── src/
 │   ├── components/
 │   │   ├── DarkVeil.css
@@ -309,6 +314,14 @@ npm run build
 ```
 
 Before submitting changes, run the tests and production build, then verify the modified functionality in the browser at desktop and mobile widths.
+
+### Site metadata
+
+The page title, description, canonical URL, Open Graph and Twitter cards, and structured data live in `public/index.html`. Keep them consistent with `public/manifest.json` and the homepage URL in `public/sitemap.xml`. The crawler rules point to that sitemap; the standalone 404 page stays out of search results.
+
+Run `npm run verify:metadata` to check metadata consistency, local asset references, and actual image dimensions. The share card is 1200×630px. App icons are square, with a padded `[T.S]` monogram derived from the original green and red wordmark.
+
+To update the artwork, run `node scripts/prepare-metadata-artwork.js` while the development server is running. Render `/metadata-preview.html` at 1200×630px for the JPEG share card, and `/metadata-preview.html?icon` at 512×512px for the icon source. Wait for the bundled fonts to load before capturing. Export PNG icons at 512, 192, 180, and 32px to the paths in `public/icons/`, keeping the central mark inside the maskable safe area. Remove the temporary preview HTML before building; it is ignored by Git.
 
 ---
 
