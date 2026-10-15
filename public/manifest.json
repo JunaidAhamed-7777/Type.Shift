@@ -1,16 +1,26 @@
 {
   "short_name": "Type.Shift",
-  "name": "Type.Shift — Typing Speed & Accuracy",
-  "description": "A free typing speed and accuracy test with literary passages, technical texts, and code.",
+  "name": "Type.Shift — Free Typing Speed Test",
+  "description": "Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required.",
+  "lang": "en",
+  "dir": "ltr",
+  "id": "/",
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "454x414",
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#101514",
   "background_color": "#101514"

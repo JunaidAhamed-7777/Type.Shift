@@ -2,10 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/logo.png" type="image/png" />
+    <link
+      rel="icon"
+      href="%PUBLIC_URL%/icons/favicon-32.png"
+      type="image/png"
+      sizes="32x32"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#101514" />
     <meta name="color-scheme" content="dark light" />
+    <meta name="application-name" content="Type.Shift" />
+    <meta name="apple-mobile-web-app-title" content="Type.Shift" />
+    <meta name="author" content="Junaid" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <script>
       try {
         document.documentElement.dataset.theme =
@@ -18,10 +27,14 @@
     </script>
     <meta
       name="description"
-      content="Find your typing rhythm with Type.Shift. Measure your words per minute and accuracy with literary passages, technical texts, and code. Free, with no account required."
+      content="Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required."
     />
     <link rel="canonical" href="https://typeshiftt.vercel.app/" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
+    <link
+      rel="apple-touch-icon"
+      href="%PUBLIC_URL%/icons/apple-touch-icon.png"
+      sizes="180x180"
+    />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -36,7 +49,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Type.Shift — Typing Speed &amp; Accuracy</title>
+    <title>Type.Shift — Free Typing Speed Test</title>
     <!-- Google Ads -->
     <script
       async
@@ -52,9 +65,46 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Type.Shift",
-        "url": "https://typeshiftt.vercel.app/"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://typeshiftt.vercel.app/#website",
+            "name": "Type.Shift",
+            "url": "https://typeshiftt.vercel.app/",
+            "description": "Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "author": {
+              "@type": "Person",
+              "name": "Junaid",
+              "url": "https://junaidahamed.runs-on.dev/"
+            },
+            "mainEntity": {
+              "@id": "https://typeshiftt.vercel.app/#app"
+            }
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://typeshiftt.vercel.app/#app",
+            "name": "Type.Shift",
+            "url": "https://typeshiftt.vercel.app/",
+            "description": "Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required.",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Any",
+            "browserRequirements": "Requires JavaScript and a modern web browser.",
+            "inLanguage": "en",
+            "isAccessibleForFree": true,
+            "image": "https://typeshiftt.vercel.app/social-preview.jpg",
+            "author": {
+              "@type": "Person",
+              "name": "Junaid",
+              "url": "https://junaidahamed.runs-on.dev/"
+            },
+            "isPartOf": {
+              "@id": "https://typeshiftt.vercel.app/#website"
+            }
+          }
+        ]
       }
     </script>
 
@@ -63,20 +113,39 @@
     <meta property="og:url" content="https://typeshiftt.vercel.app/" />
     <meta
       property="og:title"
-      content="Type.Shift — Typing Speed &amp; Accuracy"
+      content="Type.Shift — Free Typing Speed Test"
     />
     <meta
       property="og:description"
-      content="Find your typing rhythm. Test your speed and accuracy with literary passages, technical texts, and code. Free, with no account required."
+      content="Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required."
     />
-    <meta name="twitter:card" content="summary" />
+    <meta
+      property="og:image"
+      content="https://typeshiftt.vercel.app/social-preview.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="The green and red Type.Shift wordmark on a dark background, with typing speed and accuracy test details."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Type.Shift — Typing Speed &amp; Accuracy"
+      content="Type.Shift — Free Typing Speed Test"
     />
     <meta
       name="twitter:description"
-      content="Find your typing rhythm. Test your speed and accuracy with literary passages, technical texts, and code. Free, with no account required."
+      content="Test your typing speed and accuracy with books, science, and code. Choose a 15, 30, 60, or 120-second time limit. Free, with no account required."
+    />
+    <meta
+      name="twitter:image"
+      content="https://typeshiftt.vercel.app/social-preview.jpg"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="The green and red Type.Shift wordmark on a dark background, with typing speed and accuracy test details."
     />
   </head>
   <body>

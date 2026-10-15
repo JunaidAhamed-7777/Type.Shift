@@ -1,8 +1,4 @@
 User-agent: *
-Disallow: /wp-admin/
-Disallow: /wp-includes/
-Disallow: /wp-login.php
-Disallow: /search/
-Disallow: /cgi-bin/
+Allow: /
 
-Sitemap: https://typeshiftt.vercel.app
+Sitemap: https://typeshiftt.vercel.app/sitemap.xml
