@@ -18,15 +18,11 @@ Type.Shift is a React-based typing speed test designed to help users improve typ
 
 The application provides multiple difficulty levels with typing passages drawn from books, scientific and technical subjects, and programming algorithms.
 
-* Hosted on https://typeshiftt.vercel.app
+* Hosted at [typeshiftt.vercel.app](https://typeshiftt.vercel.app).
 * No account is required to start a typing test.
 * Results include Words Per Minute (WPM), accuracy, and time taken.
-* Each test randomly selects a passage from the selected difficulty level.
-
-### Preview
-
-<img width="1863" height="876" alt="image" src="https://github.com/user-attachments/assets/6fcb2bec-f210-49bf-901a-06a984b99286" />
-<img width="1866" height="862" alt="image" src="https://github.com/user-attachments/assets/5abf4b03-a874-4da0-822f-6478e1aa1e81" />
+* Each test randomly selects a passage from the selected difficulty level, avoiding repeats until that difficulty's passages have all been used during the session.
+* The original `[Type.Shift]` branding, tagline, and “With Love · For My Cheeku · By Junaid” dedication are retained.
 
 ---
 
@@ -66,31 +62,37 @@ Source attribution and appropriate cover images are maintained for applicable no
 
 ## Features
 
-* Typing speed testing with WPM calculation
-* Accuracy tracking
+* Live typing speed and final WPM calculated from correct characters, using five characters per word
+* Accuracy based on the final typed text, with Backspace available to correct mistakes
 * Correct and total character counts
 * Four difficulty levels
 * Random passage selection
+* 15-, 30-, 60-, and 120-second time limits; tests also finish when the passage is fully typed
+* Timing starts with the first typed character
 * Source attribution for passages
-* Book-cover display for applicable passages
-* Performance labels based on WPM
-* Restart button and `TAB` restart shortcut
+* Book-cover display for applicable passages on the results screen
+* Performance labels based on WPM and accuracy
+* New passage button and `Tab` restart shortcut while the typing input contains text
+* `Esc` and `Shift+Tab` to leave the typing input
 * Responsive layout for desktop and mobile
-* Welcome information lightbox
-* Privacy Policy and Terms of Use lightboxes
-* Animated DarkVeil background
-* Matrix-style result screen
-* GitHub and LinkedIn links
+* Dark theme by default, with a light theme toggle and a locally saved theme preference
+* Locally hosted fonts bundled through Fontsource
+* Keyboard-accessible “How it works” help dialog
+* Privacy Policy and Terms of Use dialogs
+* Matrix-style animation behind results, with reduced-motion support
+* Footer links to [GitHub](https://github.com/JunaidAhamed-7777/Type.Shift) and [Junaid's personal website](https://junaidahamed.runs-on.dev)
 * Vercel Web Analytics
 
 ---
 
 ## Tech Stack
 
-* React.js
+* React 19 with Create React App (`react-scripts` 5)
 * JavaScript
 * CSS
-* OGL
+* Fontsource: Bricolage Grotesque, DM Sans, IBM Plex Mono, and JetBrains Mono
+* React Icons
+* OGL (used by the retained DarkVeil component)
 * Vercel
 * Vercel Web Analytics
 
@@ -130,9 +132,11 @@ Type.Shift/
 │   │   ├── DarkVeil.css
 │   │   └── DarkVeil.js
 │   ├── data/
-│   │   └── paragraphs.js
+│   │   ├── paragraphs.js
+│   │   └── paragraphs.test.js
 │   ├── App.css
 │   ├── App.js
+│   ├── App.test.js
 │   └── index.js
 ├── AGENTS.md
 ├── CONTRIBUTING.md
@@ -287,13 +291,23 @@ Start the development server:
 npm start
 ```
 
+Open [localhost:3000](http://localhost:3000) to view changes as you edit.
+
+Run tests once without watch mode:
+
+```bash
+npm test -- --watchAll=false
+```
+
+For CI, set the `CI=true` environment variable before running the same command.
+
 Create a production build:
 
 ```bash
 npm run build
 ```
 
-Before submitting changes, verify that the application builds successfully and that the modified functionality works as expected.
+Before submitting changes, run the tests and production build, then verify the modified functionality in the browser at desktop and mobile widths.
 
 ---
 
@@ -336,7 +350,9 @@ Relevant licensing and attribution information is maintained in:
 
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)
 
-In particular, the project uses the React Bits `DarkVeil` component and the OGL library.
+The React Bits `DarkVeil` component and its OGL dependency remain in the repository, with their attribution retained. DarkVeil is not currently rendered as the application background.
+
+The results screen's Matrix-style animation is based on JavaScript Academy's Digital Rain effect. Its attribution is retained in the notices above.
 
 ---
 
