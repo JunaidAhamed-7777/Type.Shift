@@ -91,7 +91,7 @@ Source attribution and appropriate cover images are maintained for applicable no
 * React 19 with Create React App (`react-scripts` 5)
 * JavaScript
 * CSS
-* Fontsource: Bricolage Grotesque, DM Sans, IBM Plex Mono, and JetBrains Mono
+* Fontsource: Chivo, Azeret Mono, and JetBrains Mono
 * React Icons
 * OGL (used by the retained DarkVeil component)
 * Vercel

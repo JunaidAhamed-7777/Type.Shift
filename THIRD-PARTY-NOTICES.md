@@ -25,3 +25,19 @@ The Matrix Digital Rain effect is based on the Digital Rain repository by JavaSc
 
 Repository:
 https://github.com/javascriptacademy-stash/digital-rain
+
+3. Self-hosted Fonts
+
+Chivo — Copyright 2019 The Chivo Project Authors.
+Repository: https://github.com/Omnibus-Type/Chivo
+License: SIL Open Font License 1.1, retained in public/licenses/chivo.txt.
+
+Azeret Mono — Copyright 2021 The Azeret Project Authors.
+Repository: https://github.com/displaay/azeret
+License: SIL Open Font License 1.1, retained in public/licenses/azeret-mono.txt.
+
+JetBrains Mono — The original wordmark font is retained.
+Repository: https://github.com/JetBrains/JetBrainsMono
+License and copyright notice: public/licenses/jetbrains-mono.txt.
+
+Fonts are bundled locally through Fontsource packages.
