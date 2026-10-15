@@ -6,6 +6,33 @@
 @import "@fontsource/ibm-plex-mono/latin-500.css";
 @import "@fontsource/jetbrains-mono/latin-700.css";
 
+/* Registered colors interpolate once at the root so every accent moves together. */
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #276f1a;
+}
+@property --accent-soft {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e2eedf;
+}
+@property --accent-hover {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #205a16;
+}
+@property --brand-green {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #39ff14;
+}
+@property --success {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #31745b;
+}
+
 :root {
   color-scheme: light;
   --bg: #eef1f5;
@@ -33,6 +60,12 @@
   --font-display: "Bricolage Grotesque", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
   --radius: 14px;
+  transition:
+    --accent 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    --accent-soft 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    --accent-hover 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    --brand-green 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    --success 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -52,6 +85,19 @@
   --scroll-thumb: #64748b;
   --scroll-hover: #8a9bb2;
   --scroll-active: #a2afbf;
+}
+:root[data-accent="red"] {
+  --accent: #b52e37;
+  --accent-soft: #f7e4e6;
+  --accent-hover: #92232b;
+  --brand-green: #ff3b3b;
+  --success: #b52e37;
+}
+:root[data-theme="dark"][data-accent="red"] {
+  --accent: #ff3b3b;
+  --accent-soft: #42272a;
+  --accent-hover: #ff939b;
+  --success: #ff939b;
 }
 *,
 *::before,
@@ -356,6 +402,17 @@ dd {
   width: 17px;
   height: 17px;
 }
+.shift-key {
+  transition:
+    transform 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+:root[data-accent="red"] .shift-key {
+  transform: translateY(3px);
+  box-shadow:
+    0 2px 0 var(--border),
+    0 6px 12px -7px #25303b18;
+}
 .practice {
   scroll-margin-top: 24px;
 }
@@ -544,7 +601,11 @@ dd {
 .char-cursor {
   position: relative;
 }
-.char-selected { background: var(--accent-soft); text-decoration: underline; text-underline-offset: 5px; }
+.char-selected {
+  background: var(--accent-soft);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
 .char-cursor::before {
   content: "";
   position: absolute;
@@ -1091,7 +1152,10 @@ kbd {
     font-size: 20px;
     line-height: 1.9;
   }
-  .hidden-input { font-size: 20px; line-height: 1.9; }
+  .hidden-input {
+    font-size: 20px;
+    line-height: 1.9;
+  }
   .test-panel-header {
     padding: 24px 25px 0;
   }
@@ -1235,7 +1299,12 @@ kbd {
     line-height: 1.95;
     letter-spacing: -0.035em;
   }
-  .hidden-input { font-size: 18px; line-height: 1.95; letter-spacing: -0.035em; padding: 6px 3px 13px; }
+  .hidden-input {
+    font-size: 18px;
+    line-height: 1.95;
+    letter-spacing: -0.035em;
+    padding: 6px 3px 13px;
+  }
   .typing-prompt {
     font-size: 10px;
     line-height: 1.7;
@@ -1385,6 +1454,10 @@ kbd {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  :root,
+  .shift-key {
+    transition: none;
+  }
   .typing-box:focus-within .char-cursor::before {
     animation: none;
   }

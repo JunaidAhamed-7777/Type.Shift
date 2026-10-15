@@ -23,6 +23,9 @@ colors:
   dark-pending: '#99aaa0'
   dialog-shadow: '#101d3840'
   dialog-backdrop: '#18243580'
+  red-accent: '#b52e37'
+  red-accent-soft: '#f7e4e6'
+  dark-red-accent-soft: '#42272a'
 typography:
   brand:
     fontFamily: JetBrains Mono, monospace
@@ -95,6 +98,8 @@ Enabled actions have hover, pressed, and visible focus states. Errors state a re
 Feather outline icons are used for interface actions, with the existing Font Awesome GitHub/globe icons retained in the footer. Icons without text have names and tooltips. Footer social targets are adjacent, and the globe links to Junaid's personal site.
 
 The cursor is the main motion. Reduced motion stops cursor blinking and Matrix animation. The background effect pauses when the document is hidden. No entry-animation cascade or permanent WebGL rendering.
+
+Holding Shift changes green accents, including the Type wordmark, to red; releasing it restores green. On viewports up to 760px or coarse touch pointers, the same accent alternates every five seconds. Registered semantic color properties interpolate together over 700ms with cubic-bezier(.22, 1, .36, 1). The small shift key depresses by 3px over 200ms. Reduced motion removes both transitions; automatic color cycling pauses while the document is hidden. Window blur clears a held Shift so the color never sticks accidentally. The default branding remains the original green/red combination.
 
 ## Do's and Don'ts
 

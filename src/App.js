@@ -18,6 +18,7 @@ import {
 } from "react-icons/fi";
 import { Analytics } from "@vercel/analytics/react";
 import PARAGRAPHS from "./data/paragraphs";
+import useShiftAccent from "./hooks/useShiftAccent";
 
 // ─── Session-based "no repeat" tracker ─────────────────────────────
 const usedIndices = {
@@ -339,7 +340,10 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
   const [selection, setSelection] = useState([0, 0]);
   const displayInput = compositionDraft ?? userInput;
   const syncSelection = (event) => {
-    setSelection([event.currentTarget.selectionStart, event.currentTarget.selectionEnd]);
+    setSelection([
+      event.currentTarget.selectionStart,
+      event.currentTarget.selectionEnd,
+    ]);
   };
   const [focused, setFocused] = useState(false);
   const [inputNotice, setInputNotice] = useState("");
@@ -525,8 +529,12 @@ function TypingBox({ paragraph, userInput, onInput, isFinished, inputRef }) {
                 ? "char-correct"
                 : "char-wrong"
               : "char-pending";
-          const caret = i === selection[0] ? " char-cursor" : "";
-          const selected = i >= selection[0] && i < selection[1] ? " char-selected" : "";
+          const caret =
+            i === Math.min(selection[0], displayInput.length)
+              ? " char-cursor"
+              : "";
+          const selected =
+            i >= selection[0] && i < selection[1] ? " char-selected" : "";
           return (
             <span key={i} className={`${cls}${caret}${selected}`}>
               {char}
@@ -719,7 +727,9 @@ function startMatrix(canvasId) {
 
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    context.fillStyle = "#39ff14";
+    context.fillStyle = getComputedStyle(canvas)
+      .getPropertyValue("--accent")
+      .trim();
 
     context.font = fontSize + "px monospace";
 
@@ -741,6 +751,7 @@ function startMatrix(canvasId) {
 
 // ─── Main ───────────────────────────────────────────────────────────
 export default function App() {
+  useShiftAccent();
   const [totalTime, setTotalTime] = useState(60);
 
   /*
