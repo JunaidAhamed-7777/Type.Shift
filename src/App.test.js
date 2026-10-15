@@ -61,7 +61,7 @@ test("waits for actual typing and does not take focus on page load", () => {
   expect(
     screen.getByText("There Is Something Wrong With You, And I Love It."),
   ).toBeInTheDocument();
-  expect(screen.getByRole("contentinfo")).toHaveTextContent(/for my Cheeku/i);
+  expect(screen.getByRole("contentinfo")).toHaveTextContent("By Junaid");
 
   clock += 120000;
   act(() => jest.advanceTimersByTime(120000));

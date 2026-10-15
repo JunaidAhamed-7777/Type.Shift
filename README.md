@@ -22,7 +22,7 @@ The application provides multiple difficulty levels with typing passages drawn f
 * No account is required to start a typing test.
 * Results include Words Per Minute (WPM), accuracy, and time taken.
 * Each test randomly selects a passage from the selected difficulty level, avoiding repeats until that difficulty's passages have all been used during the session.
-* The original `[Type.Shift]` branding, tagline, and “With Love · For My Cheeku · By Junaid” dedication are retained.
+* The original `[Type.Shift]` branding, tagline, and “By Junaid” credit are retained.
 
 ---
 

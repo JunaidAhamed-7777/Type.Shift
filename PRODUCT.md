@@ -20,7 +20,7 @@ Desktop keyboards and mobile touch keyboards. Tab restarts from an active typing
 
 ## Brand Commitments
 
-Keep Type.Shift, Junaid's authorship and dedication, GitHub, and the personal-site link to https://junaidahamed.runs-on.dev. The user has delegated the visual direction and requested a substantial, distinctive redesign with desktop/mobile accessibility and frequent focused commits.
+Keep Type.Shift, Junaid's authorship, GitHub, and the personal-site link to https://junaidahamed.runs-on.dev. The user has delegated the visual direction and requested a substantial, distinctive redesign with desktop/mobile accessibility and frequent focused commits.
 
 ## Evidence on Hand
 

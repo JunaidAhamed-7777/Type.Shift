@@ -1448,7 +1448,7 @@ export default function App() {
         </p>
       </main>
       <footer className="app-footer">
-        <p>With Love · For My Cheeku · By Junaid</p>
+        <p>By Junaid</p>
         <div className="footer-right">
           <div className="legal-links">
             <button onClick={() => setLegalType("privacy")}>Privacy</button>
