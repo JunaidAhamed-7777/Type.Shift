@@ -652,8 +652,10 @@ kbd {
 .progress-track span {
   display: block;
   height: 100%;
+  width: 100%;
+  transform-origin: left;
   background: var(--accent);
-  transition: width 0.12s ease-out;
+  transition: transform 0.12s ease-out;
 }
 .live-stats {
   display: grid;

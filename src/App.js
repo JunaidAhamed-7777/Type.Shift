@@ -1388,7 +1388,7 @@ export default function App() {
                 >
                   <span
                     style={{
-                      width: `${(userInput.length / paragraph.length) * 100}%`,
+                      transform: `scaleX(${userInput.length / paragraph.length})`,
                     }}
                   />
                 </div>

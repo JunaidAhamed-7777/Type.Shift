@@ -13,6 +13,16 @@ colors:
   accent-soft: '#e2eedf'
   success: '#31745b'
   danger: '#b5334a'
+  brand-green: '#39ff14'
+  brand-red: '#ff3b3b'
+  brand-white: '#ffffff'
+  dark-background: '#101514'
+  dark-surface: '#181f1e'
+  dark-text: '#e6ede9'
+  dark-muted: '#a5b3aa'
+  dark-pending: '#99aaa0'
+  dialog-shadow: '#101d3840'
+  dialog-backdrop: '#18243580'
 typography:
   brand:
     fontFamily: JetBrains Mono, monospace
@@ -24,9 +34,18 @@ typography:
     fontFamily: DM Sans, sans-serif
   mono:
     fontFamily: IBM Plex Mono, monospace
+  recovery:
+    fontFamily: Courier New, monospace
 rounded:
   DEFAULT: 14px
   control: 7px
+  cursor: 1px
+  indicator: 2px
+  shortcut: 4px
+  segment: 6px
+  action: 8px
+  group: 9px
+  keycap: 10px
 spacing:
   page-max: 1160px
   workspace-max: 1000px
@@ -53,7 +72,7 @@ Cool paper is the background, near-white is the workspace, blue-black is the pri
 
 ## Typography
 
-JetBrains Mono 700 preserves the original wordmark; Bricolage Grotesque 600 carries headings; DM Sans 400/500/600 carries controls and prose; IBM Plex Mono 400/500 carries the passage and measurements. All fonts are self-hosted through Fontsource Latin subsets. Font fallback is usable offline. Passage text ranges from 18px on phones to 22px on desktop; data uses tabular figures. Display tracking never falls below -0.04em. Avoid uppercase decorative labels.
+JetBrains Mono 700 preserves the original wordmark; Bricolage Grotesque 600 carries headings; DM Sans 400/500/600 carries controls and prose; IBM Plex Mono 400/500 carries the passage and measurements. All fonts are self-hosted through Fontsource Latin subsets. The standalone recovery page deliberately uses Courier New for its wordmark and system sans for copy so it remains usable when app assets fail. Passage text ranges from 18px on phones to 22px on desktop; data uses tabular figures. Display tracking never falls below -0.04em. Avoid uppercase decorative labels.
 
 ## Layout
 
