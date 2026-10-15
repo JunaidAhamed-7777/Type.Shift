@@ -86,9 +86,10 @@ function AppearanceToggle() {
 
 function Dialog({ title, children, onClose, className = "" }) {
   const dialogRef = useRef(null);
+  const previousFocusRef = useRef(document.activeElement);
   useEffect(() => {
     const dialog = dialogRef.current;
-    const previousFocus = document.activeElement;
+    const previousFocus = previousFocusRef.current;
     const previousOverflow = document.body.style.overflow;
     dialog.showModal();
     document.body.style.overflow = "hidden";
@@ -195,6 +196,12 @@ function TypingBox({
   inputRef,
 }) {
   const boxRef = useRef(null);
+  const focusTimersRef = useRef([]);
+  const focusTimeRef = useRef(0);
+  const composingRef = useRef(false);
+  const [focused, setFocused] = useState(false);
+  const [inputNotice, setInputNotice] = useState("");
+  useEffect(() => () => focusTimersRef.current.forEach(clearTimeout), []);
 
   /*
    * Mobile browsers and in-app WebViews do not all handle the
@@ -214,6 +221,7 @@ function TypingBox({
 
     if (!box || !inputRef.current) return;
     if (document.activeElement !== inputRef.current) return;
+    if (performance.now() - focusTimeRef.current > 1000) return;
 
     const isMobile =
       /Android|iPhone|iPad|iPod/i.test(
@@ -230,12 +238,7 @@ function TypingBox({
      *
      * This is especially useful inside WebViews.
      */
-    box.scrollIntoView({
-      behavior: "auto",
-      block: "center",
-      inline: "nearest",
-    });
-
+    // Correct only an obscured field during keyboard opening; never recenter every keystroke.
     if (!viewport) return;
 
     const visibleTop =
@@ -289,6 +292,9 @@ function TypingBox({
    * They do NOT run continuously while the user scrolls.
    */
   const handleInputFocus = useCallback(() => {
+    setFocused(true);
+    focusTimeRef.current = performance.now();
+    focusTimersRef.current.forEach(clearTimeout);
     const delays = [0, 100, 300, 600];
 
     const timers = delays.map((delay) =>
@@ -298,11 +304,8 @@ function TypingBox({
       )
     );
 
-    return () => {
-      timers.forEach((timer) =>
-        clearTimeout(timer)
-      );
-    };
+    // Event handlers cannot return effect cleanup; retain timers for actual unmount cleanup.
+    focusTimersRef.current = timers;
   }, [keepTypingBoxVisible]);
 
   /*
@@ -408,157 +411,68 @@ function TypingBox({
   ]);
 
   const renderText = () => {
-    return paragraph.split("").map((char, i) => {
-      let cls = "char-pending";
-
-      if (i < userInput.length) {
-        cls =
-          userInput[i] === char
-            ? "char-correct"
-            : "char-wrong";
-      } else if (i === userInput.length) {
-        cls = "char-cursor";
-      }
-
-      return (
-        <span key={i} className={cls}>
-          {char}
-        </span>
-      );
-    });
+    let index = 0;
+    return paragraph.split(/(\s+)/).map((word, wordIndex) => (
+      <span className={/\s/.test(word) ? undefined : "text-word"} key={wordIndex}>
+        {word.split("").map((char) => {
+          const i = index++;
+          const cls = i < userInput.length ? (userInput[i] === char ? "char-correct" : "char-wrong") : i === userInput.length ? "char-cursor" : "char-pending";
+          return <span key={i} className={cls}>{char}</span>;
+        })}
+      </span>
+    ));
   };
 
   return (
     <div className="typing-box" ref={boxRef}>
-      <div
-        className="text-display"
-        onClick={() =>
-          inputRef.current?.focus()
-        }
-      >
-        {renderText()}
-      </div>
-
+      <div className="text-display" aria-hidden="true">{renderText()}</div>
+      <p id="typing-passage" className="sr-only">Passage to type: {paragraph}</p>
       <textarea
+        id="typing-input"
         ref={inputRef}
         className="hidden-input"
         value={userInput}
-        onChange={(e) =>
-          onInput(e.target.value)
-        }
+        onChange={(event) => { if (!composingRef.current) onInput(event.target.value); }}
         onFocus={handleInputFocus}
+        onBlur={() => setFocused(false)}
+        onCompositionStart={() => { composingRef.current = true; }}
+        onCompositionEnd={(event) => { composingRef.current = false; onInput(event.currentTarget.value); }}
+        onPaste={(event) => { event.preventDefault(); setInputNotice("Type each character to keep your result accurate. Pasting is off for this test."); }}
+        onDrop={(event) => { event.preventDefault(); setInputNotice("Type each character to keep your result accurate. Dropping text is off for this test."); }}
+        maxLength={paragraph.length}
         disabled={isFinished}
         spellCheck={false}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
         aria-label="Typing input area"
+        aria-describedby="typing-passage typing-help"
       />
-
-      {!isFinished && (
-        <p className="click-hint">
-          ↑ Click the text above or just start typing
-        </p>
-      )}
+      <p id="typing-help" className="typing-prompt" aria-live="polite"><FiCornerDownLeft aria-hidden="true" />{inputNotice || (focused ? "Type the passage above. Backspace to correct; Esc to leave." : userInput.length ? "Click or tap to keep typing. The clock is still running." : "Click or tap here, then start typing.")}</p>
     </div>
   );
 }
 
 // ─── Result Screen ──────────────────────────────────────────────────
-function Result({
-  wpm,
-  accuracy,
-  timeTaken,
-  source,
-  image,
-  onRestart,
-}) {
-  const { label, color } =
-    getPerformanceLabel(
-      wpm,
-      accuracy,
-      timeTaken
-    );
-
+function Result({ wpm, accuracy, timeTaken, source, image, onRestart, correctChars, totalTyped }) {
+  const headingRef = useRef(null);
+  const { label, color } = getPerformanceLabel(wpm, accuracy);
+  useEffect(() => { headingRef.current?.focus({ preventScroll: true }); }, []);
   return (
-    <div className="result-screen">
-      <div
-        className="result-badge"
-        style={{
-          borderColor: color,
-          color,
-        }}
-      >
-        {label}
-      </div>
-
-      <div className="result-grid">
-        <div className="result-card">
-          <span
-            className="result-number"
-            style={{ color: "#39ff14" }}
-          >
-            {wpm}
-          </span>
-
-          <span className="result-desc">
-            Words Per Minute
-          </span>
-        </div>
-
-        <div className="result-card">
-          <span
-            className="result-number"
-            style={{ color: "#00d4ff" }}
-          >
-            {accuracy}%
-          </span>
-
-          <span className="result-desc">
-            Accuracy
-          </span>
-        </div>
-
-        <div className="result-card">
-          <span
-            className="result-number"
-            style={{ color: "#ffd700" }}
-          >
-            {timeTaken}s
-          </span>
-
-          <span className="result-desc">
-            Time Taken
-          </span>
-        </div>
-      </div>
-
+    <section className="result-screen" aria-labelledby="result-title">
+      <div className="result-heading"><span className="completion-mark"><FiCheck aria-hidden="true" /></span><h2 id="result-title" ref={headingRef} tabIndex={-1}>One more in the books.</h2><p style={{ color }}>{label}</p></div>
+      <dl className="result-grid">
+        <div><dt>Words per minute</dt><dd>{wpm}<span>wpm</span></dd></div>
+        <div><dt>Accuracy</dt><dd>{accuracy}<span>%</span></dd></div>
+        <div><dt>Time taken</dt><dd>{timeTaken || "<1"}<span>sec</span></dd></div>
+      </dl>
+      <p className="result-detail">{correctChars} correct characters out of {totalTyped} typed. Accuracy is based on your final text.</p>
       <div className="result-source">
-        <span className="source-label">
-          Source:
-        </span>
-
-        <span className="source-text">
-          {source}
-        </span>
+        {image && <img src={image} alt="Passage book cover" width="42" height="60" onError={(event) => { event.currentTarget.style.display = "none"; }} />}
+        <div><span className="source-label">Your passage</span><p>{source.trim()}</p></div>
       </div>
-
-      {image && (
-        <div className="result-image">
-          <img
-            src={image}
-            alt="Book cover"
-          />
-        </div>
-      )}
-
-      <button
-        className="restart-btn"
-        onClick={onRestart}
-      >
-        ↺ Try Again
-      </button>
-    </div>
+      <button className="primary-button" onClick={() => onRestart()}>Another round <FiArrowRight aria-hidden="true" /></button>
+    </section>
   );
 }
 
@@ -576,6 +490,8 @@ function startMatrix(canvasId) {
 
   const context =
     canvas.getContext("2d");
+
+  if (!context) return;
 
   canvas.width =
     canvas.offsetWidth;
@@ -602,6 +518,7 @@ function startMatrix(canvasId) {
   ).fill(1);
 
   const draw = () => {
+    if (document.hidden) return;
     context.fillStyle =
       "rgba(0, 0, 0, 0.05)";
 
@@ -613,7 +530,7 @@ function startMatrix(canvasId) {
     );
 
     context.fillStyle =
-      "rgb(83, 169, 43)";
+      "#a84259";
 
     context.font =
       fontSize + "px monospace";
@@ -754,14 +671,19 @@ export default function App() {
   // ─── Matrix result effect ─────────────────────────────────────────
   useEffect(() => {
     let rain;
-
-    if (isFinished) {
-      rain =
-        startMatrix("matrix-bg");
-    }
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => {
+      clearInterval(rain);
+      if (isFinished && !motionPreference.matches) {
+        rain = startMatrix("matrix-bg");
+      }
+    };
+    updateMotion();
+    motionPreference.addEventListener("change", updateMotion);
 
     return () => {
       clearInterval(rain);
+      motionPreference.removeEventListener("change", updateMotion);
     };
   }, [isFinished]);
 
@@ -1317,7 +1239,7 @@ export default function App() {
   // ─── Change difficulty and reset ───────────────────────────────────
   const handleDifficulty =
     (d) => {
-      if (!Object.prototype.hasOwnProperty.call(PARAGRAPHS, d)) return;
+      if (d === difficulty || !Object.prototype.hasOwnProperty.call(PARAGRAPHS, d)) return;
       cancelAnimationFrame(restartFocusRef.current);
       setDifficulty(d);
 
@@ -1397,239 +1319,40 @@ export default function App() {
 
   // ─── Render ────────────────────────────────────────────────────────
   return (
-    <div
-      className={`app ${
-        isFinished
-          ? "results-active"
-          : "game-active"
-      }`}
-    >
-      <div className="darkveil-background">
-        <DarkVeil
-          hueShift={253}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={3}
-          scanlineFrequency={0.5}
-          warpAmount={1.3}
-          resolutionScale={1}
-          lightMode={false}
-        />
-      </div>
-
-      {showLightbox && (
-        <WelcomeLightbox
-          onClose={() =>
-            setShowLightbox(false)
-          }
-        />
-      )}
-
-      {legalType && (
-        <LegalLightbox
-          type={legalType}
-          onClose={() =>
-            setLegalType(null)
-          }
-        />
-      )}
-
-      {isFinished && (
-        <>
-          <canvas
-            id="matrix-bg"
-            className="matrix-bg"
-          />
-
-          <div className="matrix-overlay" />
-        </>
-      )}
-
-      <div
-        className="scanlines"
-        aria-hidden="true"
-      />
-
+    <div className={`app ${isFinished ? "results-active" : "game-active"}`}>
+      <a className="skip-link" href="#typing-test">Skip to typing test</a>
+      {showLightbox && <WelcomeLightbox onClose={() => setShowLightbox(false)} />}
+      {legalType && <LegalLightbox type={legalType} onClose={() => setLegalType(null)} />}
+      {isFinished && <canvas id="matrix-bg" className="matrix-bg" aria-hidden="true" />}
       <header className="app-header">
-        <div className="logo">
-          <span className="logo-bracket">
-            [
-          </span>
-
-          <span className="logo-type">
-            Type
-          </span>
-
-          <span className="logo-dot">
-            .
-          </span>
-
-          <span className="logo-shift">
-            Shift
-          </span>
-
-          <span className="logo-bracket">
-            ]
-          </span>
-        </div>
-
-        <p className="tagline">
-          There Is Something Wrong With You,
-          And I Love It.
-        </p>
+        <a className="brand" href="/" aria-label="Type.Shift home"><span className="brand-key"><FiArrowUp aria-hidden="true" /></span><span>type<span className="brand-dot">.</span>shift</span></a>
+        <nav aria-label="Main navigation"><a className="nav-current" href="#typing-test">Typing test</a><button className="nav-help" onClick={() => setShowLightbox(true)}>How it works <FiArrowUpRight aria-hidden="true" /></button><AppearanceToggle /></nav>
       </header>
-
-      <div className="controls">
-        <div className="control-group">
-          <span className="control-label">
-            Difficulty:
-          </span>
-
-          {[
-            "easy",
-            "medium",
-            "hard",
-            "code",
-          ].map((d) => (
-            <button
-              key={d}
-              className={`ctrl-btn ${
-                difficulty === d
-                  ? "active"
-                  : ""
-              }`}
-              onClick={() =>
-                handleDifficulty(d)
-              }
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <main className="test-area">
-        {!isFinished ? (
-          <>
-            <Timer
-              timeLeft={timeLeft}
-              totalTime={
-                totalTime
-              }
-            />
-
-            <LiveStats
-              wpm={wpm}
-              accuracy={
-                accuracy
-              }
-              correctChars={
-                correctChars
-              }
-              totalTyped={
-                totalTyped
-              }
-              onRestart={
-                handleRestart
-              }
-            />
-
-            <TypingBox
-              paragraph={
-                paragraph
-              }
-              userInput={
-                userInput
-              }
-              onInput={
-                handleInput
-              }
-              isFinished={
-                isFinished
-              }
-              inputRef={
-                inputRef
-              }
-            />
-
-            <p className="shortcut-hint">
-              TAB → Restart
-            </p>
-
-            <div className="social-links">
-              <a
-                href="https://github.com/JunaidAhamed-7777/Type.Shift"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub"
-              >
-                <FaGithub />
-              </a>
-              <a
-                href="https://junaidahamed.runs-on.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Junaid's personal website (opens in a new tab)"
-                title="Junaid's website"
-              >
-                <FaGlobe />
-              </a>
+      <main className="page-main">
+        <section className="intro" aria-labelledby="intro-title">
+          <div><h1 id="intro-title">Find your <span>rhythm.</span></h1><p>A little focus. A few words. A faster you.</p></div>
+          <div className="key-composition" aria-hidden="true"><span className="little-key key-t">t</span><span className="little-key key-y">y</span><span className="little-key key-p">p</span><span className="little-key key-e">e</span><span className="shift-key"><FiArrowUp /> shift</span></div>
+        </section>
+        <section id="typing-test" className="practice" aria-label="Typing test" tabIndex={-1}>
+          <div className="controls">
+            <fieldset className="control-group"><legend>Difficulty</legend><div className="segmented-control">{["easy", "medium", "hard", "code"].map((d) => <button key={d} className={`ctrl-btn ${difficulty === d ? "active" : ""}`} aria-pressed={difficulty === d} onClick={() => handleDifficulty(d)}>{d === "code" && <FiCode aria-hidden="true" />}{d[0].toUpperCase() + d.slice(1)}</button>)}</div></fieldset>
+            <fieldset className="control-group duration-group"><legend>Time limit</legend><div className="duration-control">{[15, 30, 60, 120].map((seconds) => <button key={seconds} className={`duration-btn ${totalTime === seconds ? "active" : ""}`} aria-pressed={totalTime === seconds} aria-label={`${seconds} seconds`} onClick={() => handleDuration(seconds)}>{seconds}<span>s</span></button>)}</div></fieldset>
+          </div>
+          {!isFinished ? <>
+            <div className="test-panel">
+              <div className="test-panel-header"><span className="test-status"><span className={`status-dot ${isRunning ? "is-running" : ""}`} />{isRunning ? "In the flow" : "Ready when you are"}</span><Timer timeLeft={timeLeft} totalTime={totalTime} /></div>
+              <TypingBox key={paragraph} paragraph={paragraph} userInput={userInput} onInput={handleInput} isFinished={isFinished} inputRef={inputRef} />
+              <div className="test-panel-footer"><span className="passage-category">{difficulty === "code" ? <FiCode aria-hidden="true" /> : <FiBookOpen aria-hidden="true" />}{({ easy: "Simple stories", medium: "Literature", hard: "Science & ideas", code: "Code & algorithms" })[difficulty]}</span><button className="new-passage" onClick={() => handleRestart()} title="New passage"><FiRotateCcw aria-hidden="true" /><span>New passage</span><kbd>Tab</kbd></button></div>
+              <div className="progress-track" role="progressbar" aria-label="Passage completed" aria-valuenow={Math.round(userInput.length / paragraph.length * 100)} aria-valuemin={0} aria-valuemax={100}><span style={{ width: `${userInput.length / paragraph.length * 100}%` }} /></div>
             </div>
-          </>
-        ) : (
-          <Result
-            wpm={wpm}
-            accuracy={
-              accuracy
-            }
-            timeTaken={
-              timeTaken
-            }
-            source={
-              paragraphData.source
-            }
-            image={
-              paragraphData.image
-            }
-            onRestart={
-              handleRestart
-            }
-          />
-        )}
+            <LiveStats wpm={wpm} accuracy={accuracy} correctChars={correctChars} totalTyped={totalTyped} />
+            <div className="practice-notes"><span><FiCornerDownLeft aria-hidden="true" /> Your first keystroke starts the clock.</span><span><kbd>Esc</kbd> to leave typing <span className="note-divider">/</span> <kbd>Tab</kbd> for a fresh start</span></div>
+          </> : <Result wpm={wpm} accuracy={accuracy} timeTaken={timeTaken} source={paragraphData.source} image={paragraphData.image} correctChars={correctChars} totalTyped={totalTyped} onRestart={handleRestart} />}
+        </section>
+        <p className="closing-note">Less rush. More rhythm.<span>Enjoy the practice.</span></p>
       </main>
-
-      <footer className="app-footer">
-        <div>
-          With Love · For My Cheeku · By Junaid
-        </div>
-
-        <div className="legal-links">
-          <button
-            onClick={() =>
-              setLegalType(
-                "privacy"
-              )
-            }
-          >
-            Privacy Policy
-          </button>
-
-          <span>·</span>
-
-          <button
-            onClick={() =>
-              setLegalType(
-                "terms"
-              )
-            }
-          >
-            Terms of Use
-          </button>
-        </div>
-      </footer>
-
+      <footer className="app-footer"><p>With love, for my Cheeku.<span>Made by Junaid.</span></p><div className="footer-right"><div className="legal-links"><button onClick={() => setLegalType("privacy")}>Privacy</button><button onClick={() => setLegalType("terms")}>Terms</button></div><span className="footer-divider" /><div className="social-links"><a href="https://github.com/JunaidAhamed-7777/Type.Shift" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)" title="View source on GitHub"><FaGithub /></a><a href="https://junaidahamed.runs-on.dev" target="_blank" rel="noopener noreferrer" aria-label="Junaid's personal website (opens in a new tab)" title="Junaid's website"><FaGlobe /></a></div></div></footer>
       <Analytics />
     </div>
   );
 }
-
